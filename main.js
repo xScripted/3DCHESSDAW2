@@ -5,7 +5,8 @@
 //Variables Globals
 var width, height;
 var scene, camera, renderer;
-var taulerOBJ = initArray(8,8);
+var boardOBJ = initArray(8,8);
+var piecesOBJ = initArray(8,8);
 var color1 = "white", color2 = "gray";
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(), INTERSECTED;
@@ -13,14 +14,13 @@ var mouse = new THREE.Vector2(), INTERSECTED;
 // MAIN
 window.onload = () => {
     init();
-    animar();
+    animate();
 }
-
 
 function init() {
     //Obtenim les dimensions del contenidor tablero3D
-    width = tauler3D.clientWidth;
-    height = tauler3D.clientHeight;
+    width = board3D.clientWidth;
+    height = board3D.clientHeight;
 
     //Iniciem variables base
     scene = new THREE.Scene();//         FOV  ASPECT RATIO   NEAR FAR
@@ -50,45 +50,49 @@ function init() {
     controls.autoRotate = true;
     ////////////////////////////////*/
 
-    generarPiezas();
-
     //L'afegim al Div contenidor
-    tauler3D.appendChild(renderer.domElement);
+    board3D.appendChild(renderer.domElement);
     
-    generarTauler();
+    newBoard();
 }
 
-function generarTauler(){
-    for(let y = 0; y < 8; y++)for(let x = 0; x < 8; x++)taulerOBJ[y][x] = generarCasilla(y,x);
+function newBoard(){
+    for(let y = 0; y < 8; y++)for(let x = 0; x < 8; x++)boardOBJ[y][x] = genSquare(y,x);
+    genPieces();
 }
 
-function generarCasilla(y,x){
+function genSquare(y,x){
     //Textura
     var texture = new THREE.TextureLoader().load('img/wood.png');
     //Tamany
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
+    var geometry = new THREE.BoxGeometry(2, 2, 2);
     //Colors alternatius
     var color = (x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0) ? color1 : color2;
     //MeshAll
     var material = new THREE.MeshPhysicalMaterial({color: color, dithering: true, map: texture});
     var cube = new THREE.Mesh(geometry, material);
-
-    cube.position.x = x; 
-    cube.position.z = y; //Profunditat
-
-    scene.add(cube);
-    
+    cube.position.x = x * 2; 
+    cube.position.z = y * 2; //Profunditat
+    scene.add(cube);    
     return cube;
 }
 
-function generarPiezas() {
-
+function genPieces() {
+    var loader = new THREE.ObjectLoader();
+    loader.load("models/set2/chess-tower.json", (obj) => bornPiece(obj.children[0],0,0));
+    //loader.load("models/set2/chess-tower.json", (obj) => bornPiece(obj,0,7));
 }
-function animar(){
-    requestAnimationFrame(animar);  //Fa la funcio d'un setInterval
-
-    //Renderitza l'escena a 60 frames 
-    renderer.render(scene, camera);
+function bornPiece(obj,z,x) {
+    obj.material.color = {b: .3, g: .7, r: .1};
+    obj.position.y = 1;
+    obj.position.x = 1;
+    obj.position.z = 1;
+    scene.add(obj);
+    console.log(obj);
+}
+function animate(){
+    requestAnimationFrame(animate);  //Fa la funcio d'un setInterval
+    renderer.render(scene, camera); //Renderitza l'escena a 60 frames 
 }
 
 //INIT ARRAY FUNCTION
