@@ -82,14 +82,7 @@ function generarCasilla(y,x){
 }
 
 function generarPiezas() {
-    var loader = new THREE.FileLoader();
-    loader.load("img/chess-horse.json", (geometry) => {
-        var t = new THREE.Geometry();
-        console.log(t.toJSON(), geometry);
-        var material = new THREE.MeshPhysicalMaterial({color: "red"});
-        var cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-    })
+
 }
 function animar(){
     requestAnimationFrame(animar);  //Fa la funcio d'un setInterval
