@@ -2,7 +2,7 @@
 //// Miquel Toran ////
 //////////////////////
 
-//Variables Globals
+//Variables Globals !
 var width, height;
 var scene, camera, renderer;
 var boardOBJ = initArray(8,8);
