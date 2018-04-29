@@ -29,11 +29,15 @@ function init() {
     renderer.setSize(width, height);
 
     //Llums !
-    var light = new THREE.AmbientLight("white"); // soft white light
-    var directionalLight = new THREE.DirectionalLight("gray");
-    directionalLight.position.set(0, 0, 5).normalize();
     scene.background = new THREE.Color("gray"); //BackgroundColor
-    scene.add(directionalLight);
+    var light = new THREE.AmbientLight("white"); // soft white light
+    var spotLight = new THREE.SpotLight( 0xffffff );
+    spotLight.position.set( 15, 20, 35 );
+    spotLight.angle = Math.PI / 4;
+    spotLight.penumbra = 0.05;
+    spotLight.decay = 2;
+    spotLight.distance = 100;
+    scene.add(spotLight);
     scene.add(light);
     
     //*// CONTROL DE CAMARA
@@ -52,7 +56,6 @@ function init() {
 
     //L'afegim al Div contenidor
     board3D.appendChild(renderer.domElement);
-    
     newBoard();
 }
 
@@ -62,12 +65,9 @@ function newBoard(){
 }
 
 function genSquare(y,x){
-    //Textura
-    var texture = new THREE.TextureLoader().load('img/wood.png');
-    //Tamany
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
-    //Colors alternatius
-    var color = (x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0) ? color1 : color2;
+    var texture = new THREE.TextureLoader().load('img/wood.png');//Textura
+    var geometry = new THREE.BoxGeometry(1, 0.5, 1);     //Tamany
+    var color = (x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0) ? color1 : color2;     //Colors alternatius
     //MeshAll
     var material = new THREE.MeshPhysicalMaterial({color: color, dithering: true, map: texture});
     var cube = new THREE.Mesh(geometry, material);
@@ -80,13 +80,33 @@ function genSquare(y,x){
 
 function genPieces() {
     let white = {r: 1, g: 1, b:1}
-    let black = {r: 0, g: 0, b:0}
+    let black = {r: 0.2, g: 0.2, b:0.2}
     var loader = new THREE.ObjectLoader();
     for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 1, x, white)); //Peons blancs
-    for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 6, x, black)); //Peons blancs
+    for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 6, x, black)); //Peons negres
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 0, 1, white)); //Cavalls blancs
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 0, 6, white)); //Cavalls blancs
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 1, black)); //Cavalls negres
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 6, black)); //Cavalls negres
+
+    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 0, 0, white)); //Torres blancs
+    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 0, 7, white)); //Torres blancs
+    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 7, 0, black)); //Torres negres
+    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 7, 7, black)); //Torres negres
+
+    loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 0, 2, white)); //Alfils blancs
+    loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 0, 5, white)); //Alfils blancs
+    loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 7, 2, black)); //Alfils negres
+    loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 7, 5, black)); //Alfils negres
+
+    loader.load("models/set2/queen.json", (obj) => bornPiece(obj, 0, 4, white)); //Reina blanc
+    loader.load("models/set2/queen.json", (obj) => bornPiece(obj, 7, 4, black)); //Reina negre
+    loader.load("models/set2/king.json", (obj) => bornPiece(obj, 0, 3, white)); //Reina blanc
+    loader.load("models/set2/king.json", (obj) => bornPiece(obj, 7, 3, black)); //Reina negre
 }
 function bornPiece(obj,z,x,color) {
     obj.material.color = color;
+    if(color.r == 0.2)obj.rotation.y = 85;
     obj.position.z = z;
     obj.position.x = x;
     obj["tipo"] = "piece";
@@ -120,9 +140,10 @@ function onClick(event) {
 function renderCasting() {
     raycaster.setFromCamera(mouse, camera); // update the picking ray with the camera and mouse position
     var intersects = raycaster.intersectObjects(scene.children);// calculate objects intersecting the picking ray
-    if(intersects[0].object.tipo == "piece"){
+    if(intersects[0].object.tipo == "piece"){    
         old = intersects[0].object;        
         old.material.emissive.setHex(0xff0000);
+        console.log(old);
     }
     if(intersects[0].object.tipo == "board"){
         old.material.emissive.setHex(0x000000);
@@ -130,17 +151,6 @@ function renderCasting() {
         old.position.z = intersects[0].object.position.z;
         old = null;
     }
-    /*if(intersects.length > 0) {
-        if(INTERSECTED != intersects[0].object) {        
-            if(INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-            INTERSECTED = intersects[0].object;
-            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-            INTERSECTED.material.emissive.setHex(0xff0000);
-        }
-    } else {
-        if(INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-        INTERSECTED = null;
-    }*/
 }
 
 window.addEventListener('click', onClick, false);
