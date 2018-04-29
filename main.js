@@ -9,7 +9,7 @@ var boardOBJ = initArray(8,8);
 var piecesOBJ = initArray(8,8);
 var color1 = "white", color2 = "gray";
 var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2(), INTERSECTED;
+var mouse = new THREE.Vector2(), OLD;
 
 // MAIN
 window.onload = () => {
@@ -73,20 +73,24 @@ function genSquare(y,x){
     var cube = new THREE.Mesh(geometry, material);
     cube.position.x = x; 
     cube.position.z = y; //Profunditat
+    cube["tipo"] = "board";
     scene.add(cube);    
     return cube;
 }
 
 function genPieces() {
+    let white = {r: 1, g: 1, b:1}
+    let black = {r: 0, g: 0, b:0}
     var loader = new THREE.ObjectLoader();
-    for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj,1,x));
-    //loader.load("models/set2/chess-tower.json", (obj) => bornPiece(obj,0,7));
+    for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 1, x, white)); //Peons blancs
+    for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 6, x, black)); //Peons blancs
 }
-function bornPiece(obj,z,x) {
+function bornPiece(obj,z,x,color) {
+    obj.material.color = color;
     obj.position.z = z;
     obj.position.x = x;
+    obj["tipo"] = "piece";
     piecesOBJ[z][x] = scene.add(obj);
-    console.log(obj);
 }
 function animate(){
     requestAnimationFrame(animate);  //Fa la funcio d'un setInterval
@@ -114,13 +118,20 @@ function onClick(event) {
 }
 
 function renderCasting() {
-	// update the picking ray with the camera and mouse position
-    raycaster.setFromCamera(mouse, camera);
-    
-	// calculate objects intersecting the picking ray
-	var intersects = raycaster.intersectObjects(scene.children);
-    if(intersects.length > 0) {
-        if(INTERSECTED != intersects[0].object ) {        
+    raycaster.setFromCamera(mouse, camera); // update the picking ray with the camera and mouse position
+    var intersects = raycaster.intersectObjects(scene.children);// calculate objects intersecting the picking ray
+    if(intersects[0].object.tipo == "piece"){
+        old = intersects[0].object;        
+        old.material.emissive.setHex(0xff0000);
+    }
+    if(intersects[0].object.tipo == "board"){
+        old.material.emissive.setHex(0x000000);
+        old.position.x = intersects[0].object.position.x;
+        old.position.z = intersects[0].object.position.z;
+        old = null;
+    }
+    /*if(intersects.length > 0) {
+        if(INTERSECTED != intersects[0].object) {        
             if(INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
             INTERSECTED = intersects[0].object;
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
@@ -129,7 +140,7 @@ function renderCasting() {
     } else {
         if(INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
         INTERSECTED = null;
-    }
+    }*/
 }
 
 window.addEventListener('click', onClick, false);
