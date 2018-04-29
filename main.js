@@ -65,29 +65,27 @@ function genSquare(y,x){
     //Textura
     var texture = new THREE.TextureLoader().load('img/wood.png');
     //Tamany
-    var geometry = new THREE.BoxGeometry(2, 2, 2);
+    var geometry = new THREE.BoxGeometry(1, 1, 1);
     //Colors alternatius
     var color = (x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0) ? color1 : color2;
     //MeshAll
     var material = new THREE.MeshPhysicalMaterial({color: color, dithering: true, map: texture});
     var cube = new THREE.Mesh(geometry, material);
-    cube.position.x = x * 2; 
-    cube.position.z = y * 2; //Profunditat
+    cube.position.x = x; 
+    cube.position.z = y; //Profunditat
     scene.add(cube);    
     return cube;
 }
 
 function genPieces() {
     var loader = new THREE.ObjectLoader();
-    loader.load("models/set2/chess-tower.json", (obj) => bornPiece(obj.children[0],0,0));
+    for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj,1,x));
     //loader.load("models/set2/chess-tower.json", (obj) => bornPiece(obj,0,7));
 }
 function bornPiece(obj,z,x) {
-    obj.material.color = {b: .3, g: .7, r: .1};
-    obj.position.y = 1;
-    obj.position.x = 1;
-    obj.position.z = 1;
-    scene.add(obj);
+    obj.position.z = z;
+    obj.position.x = x;
+    piecesOBJ[z][x] = scene.add(obj);
     console.log(obj);
 }
 function animate(){
