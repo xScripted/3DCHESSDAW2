@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Títol document</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
+    <script src="client.js"></script>
 </head>
 <style>
     table * {
@@ -18,14 +19,11 @@
         inputs[1].addEventListener("click", () => socket.emit('borrarSala'));
         socket.on('ok', (listaPartidas) => {
             let taulaHTML = "<tr><td>ID</td><td>Jugadores</td><td>Espectadores</td><td colspan='2'>Unir-se</td></tr>";
-            for(let j of listaPartidas)taulaHTML += `<tr><tr><td>${j.id}</td><td>${j.players}/2</td><td>${j.spect}</td><td><input class="unirse" type="button" data='${j.id}' value="Unir-se"></td></tr>`;
+            for(let j of listaPartidas)taulaHTML += `<tr><tr><td>${j.name.slice(0,3)}</td><td>${j.players}/2</td><td>${j.spect}</td><td><input class="unirse" type="button" data='${j.name}' value="Unir-se"></td></tr>`;
             taula.innerHTML = taulaHTML;
             let partidasUnise = document.querySelectorAll(".unirse");
             for(let j of partidasUnise)j.addEventListener("click", () => socket.emit('joinSala', j.getAttribute("data")));
         });  
-        socket.on('msg', () => {
-            alert("YES!");
-        })
     } 
 </script>
 <body>
