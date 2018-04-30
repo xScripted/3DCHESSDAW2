@@ -15,7 +15,12 @@ function client() {
         taula.innerHTML = taulaHTML;
         let partidasUnise = document.querySelectorAll(".unirse");
         for(let j of partidasUnise)j.addEventListener("click", () => socket.emit('joinSala', j.getAttribute("data")));
+        //console.log(listaPartidas);
     });  
+    socket.on('newGame', () => {
+        chess.style.display = 'block';
+        multiplayer.style.display = 'none';
+    })
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(localStorage.getItem("bgcolor") != null)colorWeb(true); //LocalStorage
@@ -28,6 +33,10 @@ function client() {
     //MENUS
     var lista1 = document.querySelectorAll("#menu div");
     //Modos
+    lista1[0].addEventListener("click", () => {
+        chess.style.display = 'block';
+        multiplayer.style.display = 'none';
+    })
     lista1[1].addEventListener("mouseover", () => {
         menu2.style.width = "400px";
         modos.style.display = "block";

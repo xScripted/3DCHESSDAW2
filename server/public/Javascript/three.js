@@ -9,11 +9,11 @@ var boardOBJ = initArray(8,8);
 var piecesOBJ = initArray(8,8);
 var color1 = "white", color2 = "gray";
 var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2(), OLD;
+var mouse = new THREE.Vector2(), old;
 
 // MAIN
 window.onload = () => {
-    //client();
+    client();
     init();
     animate();
 }
@@ -42,12 +42,12 @@ function init() {
     scene.add(light);
     
     //*// CONTROL DE CAMARA
-    camera.position.x = 0;
+    camera.position.x = 10;
     camera.position.y = 5;
     camera.position.z = 10;
 
     let controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.target.set(4, 0, 4);
+    controls.target.set(4, 2, 4);
     controls.addEventListener('change',renderer);
     controls.minDistance = 0;
     controls.maxDistance = 500;
@@ -132,25 +132,26 @@ function onClick(event) {
     // (-1 to +1) for both components
     let canvas = document.querySelector("canvas");
     let formulaW = (window.innerWidth - canvas.width) / 2 / width;
+    let formulaH = (window.innerHeight- canvas.height) / 2 / height; // No funciona
 	mouse.x = (event.clientX  / width - formulaW) * 2 - 1;
     mouse.y = - (event.clientY / height) * 2 + 1;
-    //console.log(mouse);
     renderCasting();//RayCasting
 }
-
 function renderCasting() {
     raycaster.setFromCamera(mouse, camera); // update the picking ray with the camera and mouse position
     var intersects = raycaster.intersectObjects(scene.children);// calculate objects intersecting the picking ray
-    if(intersects[0].object.tipo == "piece"){    
-        old = intersects[0].object;        
-        old.material.emissive.setHex(0xff0000);
-        console.log(old);
-    }
-    if(intersects[0].object.tipo == "board"){
-        old.material.emissive.setHex(0x000000);
-        old.position.x = intersects[0].object.position.x;
-        old.position.z = intersects[0].object.position.z;
-        old = null;
+    if(intersects.length > 0){
+        if(intersects[0].object.tipo == "piece"){    
+            old = intersects[0].object;        
+            old.material.emissive.setHex(0xff0000);
+        }
+        if(intersects[0].object.tipo == "board"){
+            socket.emit('test', {x1: old.position.x, y1: old.position.z, x2:intersects[0].object.position.x, y2: intersects[0].object.position.z});
+            old.material.emissive.setHex(0x000000);
+            old.position.x = intersects[0].object.position.x;
+            old.position.z = intersects[0].object.position.z;
+            old = null;
+        }
     }
 }
 

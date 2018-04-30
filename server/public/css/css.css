@@ -65,7 +65,7 @@ html, body{
 }
 #m1 {
     color: yellow;
-    height: 0px;
+    display: none;
 }
 .marcador {
     transition: .5s;
