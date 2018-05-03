@@ -15,24 +15,23 @@ var mouse = new THREE.Vector2(), old;
 window.onload = () => {
     client();
     init();
-    animate();
 }
 
 function init() {
     //Obtenim les dimensions del contenidor tablero3D
-    width = board3D.clientWidth;
+    width  = board3D.clientWidth;
     height = board3D.clientHeight;
 
     //Iniciem variables base
-    scene = new THREE.Scene();//         FOV  ASPECT RATIO   NEAR FAR
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer();
+    scene = new THREE.Scene();//         FOV  ASPECT RATIO                           NEAR FAR
+    camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(width, height);
 
     //Llums !
     scene.background = new THREE.Color(threebg); //BackgroundColor
     var light = new THREE.AmbientLight("white"); // soft white light
-    var spotLight = new THREE.SpotLight( 0xffffff );
+    var spotLight = new THREE.SpotLight(0xffffff);
     spotLight.position.set( 15, 20, 35 );
     spotLight.angle = Math.PI / 4;
     spotLight.penumbra = 0.05;
@@ -58,6 +57,7 @@ function init() {
     //L'afegim al Div contenidor
     board3D.appendChild(renderer.domElement);
     newBoard();
+    animate();
 }
 
 function newBoard(){
@@ -90,20 +90,20 @@ function genPieces() {
     loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 1, black)); //Cavalls negres
     loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 6, black)); //Cavalls negres
 
-    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 0, 0, white)); //Torres blancs
-    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 0, 7, white)); //Torres blancs
-    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 7, 0, black)); //Torres negres
-    loader.load("models/set2/tower.json", (obj) => bornPiece(obj, 7, 7, black)); //Torres negres
+    loader.load("models/set2/tower.json",  (obj) => bornPiece(obj, 0, 0, white)); //Torres blancs
+    loader.load("models/set2/tower.json",  (obj) => bornPiece(obj, 0, 7, white)); //Torres blancs
+    loader.load("models/set2/tower.json",  (obj) => bornPiece(obj, 7, 0, black)); //Torres negres
+    loader.load("models/set2/tower.json",  (obj) => bornPiece(obj, 7, 7, black)); //Torres negres
 
     loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 0, 2, white)); //Alfils blancs
     loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 0, 5, white)); //Alfils blancs
     loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 7, 2, black)); //Alfils negres
     loader.load("models/set2/bishop.json", (obj) => bornPiece(obj, 7, 5, black)); //Alfils negres
 
-    loader.load("models/set2/queen.json", (obj) => bornPiece(obj, 0, 4, white)); //Reina blanc
-    loader.load("models/set2/queen.json", (obj) => bornPiece(obj, 7, 4, black)); //Reina negre
-    loader.load("models/set2/king.json", (obj) => bornPiece(obj, 0, 3, white)); //Reina blanc
-    loader.load("models/set2/king.json", (obj) => bornPiece(obj, 7, 3, black)); //Reina negre
+    loader.load("models/set2/queen.json",  (obj) => bornPiece(obj, 0, 4, white)); //Reina blanc
+    loader.load("models/set2/queen.json",  (obj) => bornPiece(obj, 7, 4, black)); //Reina negre
+    loader.load("models/set2/king.json",   (obj) => bornPiece(obj, 0, 3, white)); //Reina blanc
+    loader.load("models/set2/king.json",   (obj) => bornPiece(obj, 7, 3, black)); //Reina negre
 }
 function bornPiece(obj,z,x,color) {
     obj.material.color = color;
@@ -111,7 +111,9 @@ function bornPiece(obj,z,x,color) {
     obj.position.z = z;
     obj.position.x = x;
     obj["tipo"] = "piece";
-    piecesOBJ[z][x] = scene.add(obj);
+    obj["nameColor"] = color.r == 1 ? "white" : "black"; // Pasem rbg a nom normal per fer la distincio;
+    piecesOBJ[z][x] = obj;
+    scene.add(obj);
 }
 function animate(){
     requestAnimationFrame(animate);  //Fa la funcio d'un setInterval
@@ -132,9 +134,9 @@ function onClick(event) {
     // (-1 to +1) for both components
     let canvas = document.querySelector("canvas");
     let formulaW = (window.innerWidth - canvas.width) / 2 / width;
-    let formulaH = (window.innerHeight- canvas.height) / 2 / height; // No funciona
+    let formulaH = (window.innerHeight - canvas.height) / 2 / height; // No funciona
 	mouse.x = (event.clientX  / width - formulaW) * 2 - 1;
-    mouse.y = - (event.clientY / height) * 2 + 1;
+    mouse.y = - (event.clientY / height) * 2 + 1.17;
     renderCasting();//RayCasting
 }
 function renderCasting() {
@@ -146,7 +148,15 @@ function renderCasting() {
             old.material.emissive.setHex(0xff0000);
         }
         if(intersects[0].object.tipo == "board"){
-            socket.emit('test', {x1: old.position.x, y1: old.position.z, x2:intersects[0].object.position.x, y2: intersects[0].object.position.z});
+            socket.emit('test', {
+                x1: old.position.x, 
+                y1: old.position.z, 
+                x2:intersects[0].object.position.x, 
+                y2: intersects[0].object.position.z, 
+                color: old.nameColor,
+                room: room
+            }); //Enviem les coordenades i color al servidor
+
             old.material.emissive.setHex(0x000000);
             old.position.x = intersects[0].object.position.x;
             old.position.z = intersects[0].object.position.z;
@@ -156,3 +166,14 @@ function renderCasting() {
 }
 
 window.addEventListener('click', onClick, false);
+
+function reloadPieces() {
+    for(let z = 0; z < 8; z++) {
+        for(let x = 0; x < 8; x++){
+            if(piecesOBJ[z][x] != 0){
+                piecesOBJ[z][x].position.x = x;
+                piecesOBJ[z][x].position.z = z;
+            }
+        }
+    }
+}

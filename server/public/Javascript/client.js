@@ -3,6 +3,7 @@ var timer;
 var t1 = t2 = 600; //Segundos
 var turno = "blanco";
 var threebg = "gray";
+var room;
 
 function client() {
     //Socket IO
@@ -15,11 +16,16 @@ function client() {
         taula.innerHTML = taulaHTML;
         let partidasUnise = document.querySelectorAll(".unirse");
         for(let j of partidasUnise)j.addEventListener("click", () => socket.emit('joinSala', j.getAttribute("data")));
-        //console.log(listaPartidas);
     });  
-    socket.on('newGame', () => {
+    socket.on('newGame', (data) => {
+        reloadPieces();
+        room = data;
         chess.style.display = 'block';
         multiplayer.style.display = 'none';
+    })
+
+    socket.on('testReturned', () => {
+        console.log("Estupiendo !");
     })
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

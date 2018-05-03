@@ -6,8 +6,7 @@ var io = require('socket.io')(server);
 
 server.listen(3000);
 
-
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
@@ -19,11 +18,17 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => borrarSala(socket));
   socket.on('borrarSala', () => borrarSala(socket));
   socket.on('joinSala', (id) => joinSala(socket,id));
-  socket.on('test', (socket, mv) => checkMove(socket, mv));
+  socket.on('test',     (mv) => checkMove(socket, mv));
 });
 
 function checkMove(socket, mv) {
-  console.log(socket);
+  var returned = {
+    move: true,
+    enroque: false
+  }
+  console.log("Log: ", socket.id,mv);
+
+  socket.emit('testReturned', returned);
 }
 
 function actualitzarTaula() {
@@ -51,7 +56,7 @@ function joinSala(socket, data) {
       // NEW GAME
       if(j.players == 2){       
         j.estat = 'In Game';
-        io.to(j.name).emit('newGame');
+        io.to(j.name).emit('newGame', data);       
       }
       actualitzarTaula();
     }

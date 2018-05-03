@@ -65,7 +65,6 @@ html, body{
 }
 #m1 {
     color: yellow;
-    display: none;
 }
 .marcador {
     transition: .5s;
@@ -163,8 +162,6 @@ b {
 }
 #taula > div > div {
     width: 100%;
-}
-#taula > div > div {
     padding: 20px;
 }
 #taula > div > div:last-child {
