@@ -24,7 +24,13 @@ function client() {
         multiplayer.style.display = 'none';
     })
 
-    socket.on('testReturned', () => {
+    socket.on('testReturned', (returned) => {
+        if(returned.move){
+            piecesOBJ[returned.mv.y1][returned.mv.x1].position.x = returned.mv.x2;
+            piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
+            piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
+            piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
+        }
         console.log("Estupiendo !");
     })
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

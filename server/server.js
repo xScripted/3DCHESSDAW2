@@ -24,11 +24,12 @@ io.on('connection', (socket) => {
 function checkMove(socket, mv) {
   var returned = {
     move: true,
-    enroque: false
+    enroque: false,
+    mv: mv
   }
   console.log("Log: ", socket.id,mv);
 
-  socket.emit('testReturned', returned);
+  io.to(mv.room).emit('testReturned', returned);
 }
 
 function actualitzarTaula() {

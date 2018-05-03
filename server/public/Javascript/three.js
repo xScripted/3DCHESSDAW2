@@ -61,9 +61,36 @@ function init() {
 }
 
 function newBoard(){
-    for(let y = 0; y < 8; y++)for(let x = 0; x < 8; x++)boardOBJ[y][x] = genSquare(y,x);
-    genPieces();
+    var material = new THREE.MeshPhysicalMaterial({color: "gray", dithering: true});
+    var border = new THREE.BoxGeometry(10, 0.5, 1); 
+    var border1 = new THREE.Mesh(border, material);
+    var border2 = new THREE.Mesh(border, material);
+    var border3 = new THREE.Mesh(border, material);
+    var border4 = new THREE.Mesh(border, material);
+
+    border1.position.x = 3.5;
+    border1.position.z = -1;
+
+    border2.position.x = 3.5;
+    border2.position.z = 8;
+
+    border3.position.x = 8;
+    border3.position.z = 3.5;
+    border3.rotation.y = 1.57;
+
+    border4.position.x = -1;
+    border4.position.z = 3.5;
+    border4.rotation.y = 1.57;
+
+    scene.add(border1);  
+    scene.add(border2); 
+    scene.add(border3);  
+    scene.add(border4); 
+
+    for(let y = 0; y < 8; y++)for(let x = 0; x < 8; x++)boardOBJ[y][x] = genSquare(y,x); //Tauler
+    genPieces();  
 }
+
 
 function genSquare(y,x){
     var texture = new THREE.TextureLoader().load('img/wood.png');//Textura
@@ -75,7 +102,7 @@ function genSquare(y,x){
     cube.position.x = x; 
     cube.position.z = y; //Profunditat
     cube["tipo"] = "board";
-    scene.add(cube);    
+    scene.add(cube);  
     return cube;
 }
 
