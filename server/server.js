@@ -27,16 +27,17 @@ function checkMove(socket, mv) {
     enroque: false,
     mv: mv
   }
+  
+  //Comprobar torn
   for(let x of listaPartidas){
-    console.log("cM: ", mv.room, x.name);
-    if(mv.room == x.name){
-      if(socket.id == x.ids[x.turn]){
-        returned.move = true;     
-        x.turn = x.turn == 0 ? 1 : 0; //Toggle
+    if(mv.room == x.name){      
+      //console.log();
+      if(socket.id == x.ids[x.turn] && x.board[mv.y1][mv.x1].color == x.turn){ //Comprobar Torn && Color
+          returned.move = true;     
+          x.turn = x.turn == 0 ? 1 : 0; //Toggle                
       } else {
         returned.move = false;
       }       
-      console.log(x.turn);
       break;
     }
   }
@@ -98,28 +99,28 @@ function initBoard(){
     for(let x = 0; x < 8; x++){     
       //Creating pieces
       //PAWNS
-      if(y == 1)tmp = buildPieza(y, x, "pb", "peonb.png", "peon", "blanco", tmp);  
-      if(y == 6)tmp = buildPieza(y, x, "pn", "peon.png", "peon", "negro", tmp); 
+      if(y == 1)tmp = buildPieza(y, x, "pb", "peonb.png", "peon", 0, tmp);  
+      if(y == 6)tmp = buildPieza(y, x, "pn", "peon.png", "peon", 1, tmp); 
 
       //TOWERS
-      if(y == 0 && (x == 0 || x == 7))tmp = buildPieza(y, x, "tb", "torreb.png", "torre", "blanco", tmp);
-      if(y == 7 && (x == 0 || x == 7))tmp = buildPieza(y, x, "tn", "torre.png", "torre", "negro", tmp);
+      if(y == 0 && (x == 0 || x == 7))tmp = buildPieza(y, x, "tb", "torreb.png", "torre", 0, tmp);
+      if(y == 7 && (x == 0 || x == 7))tmp = buildPieza(y, x, "tn", "torre.png", "torre", 1, tmp);
 
       //BISHOPS
-      if(y == 0 && (x == 2 || x == 5))tmp = buildPieza(y, x, "ab", "alfilb.png", "alfil", "blanco", tmp);
-      if(y == 7 && (x == 2 || x == 5))tmp = buildPieza(y, x, "an", "alfil.png", "alfil", "negro", tmp);
+      if(y == 0 && (x == 2 || x == 5))tmp = buildPieza(y, x, "ab", "alfilb.png", "alfil", 0, tmp);
+      if(y == 7 && (x == 2 || x == 5))tmp = buildPieza(y, x, "an", "alfil.png", "alfil", 1, tmp);
 
       //KNIGHTS
-      if(y == 0 && (x == 1 || x == 6))tmp = buildPieza(y, x, "cb", "cabb.png", "caballo", "blanco", tmp);
-      if(y == 7 && (x == 1 || x == 6))tmp = buildPieza(y, x, "cn", "cab.png", "caballo", "negro", tmp);
+      if(y == 0 && (x == 1 || x == 6))tmp = buildPieza(y, x, "cb", "cabb.png", "caballo", 0, tmp);
+      if(y == 7 && (x == 1 || x == 6))tmp = buildPieza(y, x, "cn", "cab.png", "caballo", 1, tmp);
       
       //QUEEN
-      if(y == 0 && x == 4)tmp = buildPieza(y, x, "db", "damab.png", "dama", "blanco", tmp);
-      if(y == 7 && x == 4)tmp = buildPieza(y, x, "dn", "dama.png", "dama", "negro", tmp);
+      if(y == 0 && x == 4)tmp = buildPieza(y, x, "db", "damab.png", "dama", 0, tmp);
+      if(y == 7 && x == 4)tmp = buildPieza(y, x, "dn", "dama.png", "dama", 1, tmp);
 
       //KING
-      if(y == 0 && x == 3)tmp = buildPieza(y, x, "rb", "reyb.png", "rey", "blanco", tmp);
-      if(y == 7 && x == 3)tmp = buildPieza(y, x, "rn", "rey.png", "rey", "negro", tmp);
+      if(y == 0 && x == 3)tmp = buildPieza(y, x, "rb", "reyb.png", "rey", 0, tmp);
+      if(y == 7 && x == 3)tmp = buildPieza(y, x, "rn", "rey.png", "rey", 1, tmp);
     }    
   } 
   return tmp;
