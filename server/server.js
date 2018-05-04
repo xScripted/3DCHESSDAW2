@@ -31,7 +31,6 @@ function checkMove(socket, mv) {
   //Comprobar torn
   for(let x of listaPartidas){
     if(mv.room == x.name){      
-      //console.log();
       if(socket.id == x.ids[x.turn] && x.board[mv.y1][mv.x1].color == x.turn){ //Comprobar Torn && Color
           returned.move = true;     
           x.turn = x.turn == 0 ? 1 : 0; //Toggle                
@@ -66,11 +65,19 @@ function joinSala(socket, data) {
       socket.join(data);
       j.ids.push(socket.id);    
       j.players += 1; 
+
       // NEW GAME
       if(j.players == 2){       
         j.estat = 'In Game';
-        io.to(j.name).emit('newGame', j.ids);      
+        io.to(j.name).emit('newGame', j.ids); 
+
+        setInterval(() => {
+          if(j.turn == 0)j.time1 -= 1;
+          if(j.turn == 1)j.time2 -= 1;
+          io.to(j.name).emit('tictoc', {t1: j.time1, t2: j.time2}); 
+        }, 1000)     
       }
+      
       actualitzarTaula();
     }
   }
@@ -144,3 +151,4 @@ class Pieza {
       this.used = false; // Solo para torres
   }
 }
+

@@ -37,14 +37,15 @@ function client() {
             dvId[1].innerHTML = `User${ids[1].slice(0,3)}`;
         }
     })
+
+    socket.on('tictoc', (times) => {
+        timer1.innerHTML = toTimeSystem(times.t1);
+        timer2.innerHTML = toTimeSystem(times.t2);
+    })
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(localStorage.getItem("bgcolor") != null)colorWeb(true); //LocalStorage
     if(localStorage.getItem("tbcolor") != null)colorTablero(true); //LocalStorage
-    
-    //RELOJES
-    timer1.innerHTML = toTimeSystem(t1);
-    timer2.innerHTML = toTimeSystem(t2);
 
     //MENUS
     var lista1 = document.querySelectorAll("#menu div");
@@ -72,8 +73,8 @@ function client() {
         multiplayer.style.display = "block";
     })
     menu2.addEventListener("mouseout",  () => {menu2.style.width = "50px"; menu.style.width = "50px"});
-    menu.addEventListener("mouseover",  () => menu.style.width = "220px");
     menu2.addEventListener("mouseover", () => {menu2.style.width = "400px"; menu.style.width = "220px"});
+    menu.addEventListener("mouseover",  () => menu.style.width = "220px");
     menu.addEventListener("mouseout", () => {
         menu2.style.width = "50px";
         menu.style.width = "50px";

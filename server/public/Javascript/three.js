@@ -41,6 +41,7 @@ function init() {
     scene.add(light);
     
     //*// CONTROL DE CAMARA
+    //camera.lookAt(30,20,10);
     camera.position.x = 10;
     camera.position.y = 5;
     camera.position.z = 10;
@@ -166,6 +167,7 @@ function onClick(event) {
     mouse.y = - (event.clientY / height) * 2 + 1.17;
     renderCasting();//RayCasting
 }
+
 function renderCasting() {
     raycaster.setFromCamera(mouse, camera); // update the picking ray with the camera and mouse position
     var intersects = raycaster.intersectObjects(scene.children);// calculate objects intersecting the picking ray
@@ -188,8 +190,7 @@ function renderCasting() {
                     piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
                     piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
                     piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
-                }
-                console.log("Estupendo !", returned);
+                }            
             })
             old.material.emissive.setHex(0x000000);
             //old.position.x = intersects[0].object.position.x;
@@ -202,12 +203,5 @@ function renderCasting() {
 window.addEventListener('click', onClick, false);
 
 function reloadPieces() {
-    for(let z = 0; z < 8; z++) {
-        for(let x = 0; x < 8; x++){
-            if(piecesOBJ[z][x] != 0){
-                piecesOBJ[z][x].position.x = x;
-                piecesOBJ[z][x].position.z = z;
-            }
-        }
-    }
+
 }
