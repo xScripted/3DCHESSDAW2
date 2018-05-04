@@ -4,9 +4,11 @@ var t1 = t2 = 600; //Segundos
 var turno = "blanco";
 var threebg = "gray";
 var room;
+var j1 = true; //Indica si es el jugador 1 o 2;
 
 function client() {
     //Socket IO
+    room = socket.id;
     var inputs = document.querySelectorAll("#crearysalir input");
     inputs[0].addEventListener("click", () => socket.emit('crearSala'));
     inputs[1].addEventListener("click", () => socket.emit('borrarSala'));
@@ -15,23 +17,25 @@ function client() {
         for(let j of listaPartidas)taulaHTML += `<div><div>${j.name.slice(0,3)}</div><div>${j.players}/2</div><div>${j.estat}</div><div><input class="unirse" type="button" data='${j.name}' value="Entrar"></div></div>`;
         taula.innerHTML = taulaHTML;
         let partidasUnise = document.querySelectorAll(".unirse");
-        for(let j of partidasUnise)j.addEventListener("click", () => socket.emit('joinSala', j.getAttribute("data")));
-    });  
-    socket.on('newGame', (data) => {
-        reloadPieces();
-        room = data;
-        chess.style.display = 'block';
-        multiplayer.style.display = 'none';
+        for(let j of partidasUnise)j.addEventListener("click", () => {
+            socket.emit('joinSala', j.getAttribute("data"));
+            room = j.getAttribute("data");
+            j1 = false;
+        });  
     })
 
-    socket.on('testReturned', (returned) => {
-        if(returned.move){
-            piecesOBJ[returned.mv.y1][returned.mv.x1].position.x = returned.mv.x2;
-            piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
-            piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
-            piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
+    socket.on('newGame', (ids) => {
+        reloadPieces();
+        chess.style.display = 'block';
+        multiplayer.style.display = 'none';
+        let dvId = document.querySelectorAll(".nameId");
+        if(j1){
+            dvId[1].innerHTML = `User${ids[0].slice(0,3)}`;
+            dvId[0].innerHTML = `User${ids[1].slice(0,3)}`;
+        } else {
+            dvId[0].innerHTML = `User${ids[0].slice(0,3)}`;
+            dvId[1].innerHTML = `User${ids[1].slice(0,3)}`;
         }
-        console.log("Estupiendo !");
     })
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -79,7 +83,7 @@ function client() {
     inputColor.addEventListener("input" , () => colorWeb());
     inputColor2.addEventListener("input", () => colorTablero());
 } 
-
+    
 /* Oscurece un color hexadecimal de 6 caracteres #RRGGBB segun el porcentaje indicado */
 function changeColor(color, amount){
     color = (color.indexOf("#")>=0) ? color.substring(1,color.length) : color;
@@ -95,22 +99,7 @@ const subtractLight = function(color, amount){
     return c;
 }
 
-//Relojes
-timer = setInterval(() => {
-    if(turno == "blanco"){
-        timer1.innerHTML = toTimeSystem(t1);
-        t1--;            
-    } else {
-        timer2.innerHTML = toTimeSystem(t2);
-        t2--;
-    }
-    //COMPROBAMOS DERROTA POR TIEMPO
-    if(t1 < 0 || t2 < 0){
-        turno = turno == "blanco" ? "negras" : "blancas";
-        alert("Las " +  turno +" ganan por tiempo");
-        clearInterval(timer);
-    }
-},1000) 
+ 
 
 function toTimeSystem(time){
     let min = Math.floor(time / 60);

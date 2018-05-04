@@ -180,13 +180,20 @@ function renderCasting() {
                 y1: old.position.z, 
                 x2:intersects[0].object.position.x, 
                 y2: intersects[0].object.position.z, 
-                color: old.nameColor,
                 room: room
             }); //Enviem les coordenades i color al servidor
-
+            socket.on('testReturned', (returned) => {
+                if(returned.move){
+                    piecesOBJ[returned.mv.y1][returned.mv.x1].position.x = returned.mv.x2;
+                    piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
+                    piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
+                    piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
+                }
+                console.log("Estupendo !", returned);
+            })
             old.material.emissive.setHex(0x000000);
-            old.position.x = intersects[0].object.position.x;
-            old.position.z = intersects[0].object.position.z;
+            //old.position.x = intersects[0].object.position.x;
+            //old.position.z = intersects[0].object.position.z;
             old = null;
         }
     }

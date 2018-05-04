@@ -27,8 +27,19 @@ function checkMove(socket, mv) {
     enroque: false,
     mv: mv
   }
-  console.log("Log: ", socket.id,mv);
-
+  for(let x of listaPartidas){
+    console.log("cM: ", mv.room, x.name);
+    if(mv.room == x.name){
+      if(socket.id == x.ids[x.turn]){
+        returned.move = true;     
+        x.turn = x.turn == 0 ? 1 : 0; //Toggle
+      } else {
+        returned.move = false;
+      }       
+      console.log(x.turn);
+      break;
+    }
+  }
   io.to(mv.room).emit('testReturned', returned);
 }
 
@@ -41,7 +52,7 @@ function crearSala(socket){
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
     socket.join(socket.id); //Creem la sala 
-    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard()}); // Creem un objecte de la sala i la introduim al array de salas
+    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard(), time1: 600, time2: 600, turn: Math.floor(Math.random()*2)}); // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
     actualitzarTaula();
   }
@@ -57,7 +68,7 @@ function joinSala(socket, data) {
       // NEW GAME
       if(j.players == 2){       
         j.estat = 'In Game';
-        io.to(j.name).emit('newGame', data);       
+        io.to(j.name).emit('newGame', j.ids);      
       }
       actualitzarTaula();
     }
@@ -78,7 +89,6 @@ function borrarSala(socket){
   }
   actualitzarTaula();
 }
-
 
 //INIT ARRAY FUNCTION
 function initBoard(){
