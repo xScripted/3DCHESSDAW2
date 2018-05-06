@@ -163,7 +163,7 @@ class Pieza {
 //PEON BLANCO                   
 function testPeonBlanco(tablero, allowPlay, Py, Px, y, x) { 
   if(Px != x || Py > y || tablero[Py + 1][Px] != 0 || tablero[y][x] != 0 || ((y - Py) > 1))allowPlay = false;  
-  if(Py == 1 && y == 3 && tablero[2][x] == 0)allowPlay = true;      
+  if(Px == x && Py == 1 && y == 3 && tablero[2][x] == 0)allowPlay = true;      
   if((y == Py + 1 && x == Px + 1) && tablero[Py + 1][Px + 1].color == 1)allowPlay = true;     
   if((y == Py + 1 && x == Px - 1) && tablero[Py + 1][Px - 1].color == 1)allowPlay = true;      
   return allowPlay;
@@ -172,7 +172,7 @@ function testPeonBlanco(tablero, allowPlay, Py, Px, y, x) {
 //PEON NEGRO                    
 function testPeonNegro(tablero, allowPlay, Py, Px, y, x) { 
   if(Px != x || Py < y || tablero[Py - 1][Px] != 0 || tablero[y][x] != 0 || ((Py - y) > 1))allowPlay = false;  
-  if(Py == 6 && y == 4 && tablero[5][x] == 0)allowPlay = true;    
+  if(Px == x && Py == 6 && y == 4 && tablero[5][x] == 0)allowPlay = true;    
   if((y == Py - 1 && x == Px + 1) && tablero[Py - 1][Px + 1].color == 0)allowPlay = true;     
   if((y == Py - 1 && x == Px - 1) && tablero[Py - 1][Px - 1].color == 0)allowPlay = true;     
   return allowPlay;
