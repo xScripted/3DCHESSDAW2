@@ -8,7 +8,6 @@ var j1 = true; //Indica si es el jugador 1 o 2;
 
 function client() {
     //Socket IO
-    room = socket.id;
     var inputs = document.querySelectorAll("#crearysalir input");
     inputs[0].addEventListener("click", () => socket.emit('crearSala'));
     inputs[1].addEventListener("click", () => socket.emit('borrarSala'));
@@ -26,6 +25,7 @@ function client() {
 
     socket.on('newGame', (ids) => {
         reloadPieces();
+        room = ids[0];
         chess.style.display = 'block';
         multiplayer.style.display = 'none';
         let dvId = document.querySelectorAll(".nameId");
@@ -38,7 +38,7 @@ function client() {
         }
     })
 
-    socket.on('tictoc', (times) => {
+    socket.on('tictoc', (times) => { //No funciona bien el orden
         timer1.innerHTML = toTimeSystem(times.t1);
         timer2.innerHTML = toTimeSystem(times.t2);
     })

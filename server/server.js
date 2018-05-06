@@ -22,24 +22,32 @@ io.on('connection', (socket) => {
 });
 
 function checkMove(socket, mv) {
+  let obj; 
   var returned = {
     move: true,
-    enroque: false,
     mv: mv
   }
-  
+  for(let x of listaPartidas)if(x.name == mv.room)obj = x;
+  if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 0)returned.move = testPeonBlanco(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON B
+  if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 1)returned.move = testPeonNegro (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON N   
+  if(obj.board[mv.y1][mv.x1].tipo == "torre")returned.move = testTorres(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST TORRE B&N
+  if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
+  if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
+  if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+
   //Comprobar torn
-  for(let x of listaPartidas){
-    if(mv.room == x.name){      
-      if(socket.id == x.ids[x.turn] && x.board[mv.y1][mv.x1].color == x.turn){ //Comprobar Torn && Color
-          returned.move = true;     
-          x.turn = x.turn == 0 ? 1 : 0; //Toggle                
-      } else {
-        returned.move = false;
-      }       
-      break;
-    }
+  //if(socket.id == obj.ids[obj.turn] && obj.board[mv.y1][mv.x1].color == obj.turn){ //Comprobar Torn && Color            
+ ///     obj.turn = obj.turn == 0 ? 1 : 0; //Toggle                
+//  } else {
+//      returned.move = false;
+//  }       
+  if(returned.move){
+    obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
+    obj.board[mv.y1][mv.x1] = 0;
+    for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board;
   }
+  returned['cl'] = obj;
+  console.log(mv.room);
   io.to(mv.room).emit('testReturned', returned);
 }
 
@@ -151,4 +159,126 @@ class Pieza {
       this.used = false; // Solo para torres
   }
 }
+
+//PEON BLANCO                   
+function testPeonBlanco(tablero, allowPlay, Py, Px, y, x) { 
+  if(Px != x || Py > y || tablero[Py + 1][Px] != 0 || tablero[y][x] != 0 || ((y - Py) > 1))allowPlay = false;  
+  if(Py == 1 && y == 3 && tablero[2][x] == 0)allowPlay = true;      
+  if((y == Py + 1 && x == Px + 1) && tablero[Py + 1][Px + 1].color == 1)allowPlay = true;     
+  if((y == Py + 1 && x == Px - 1) && tablero[Py + 1][Px - 1].color == 1)allowPlay = true;      
+  return allowPlay;
+}
+
+//PEON NEGRO                    
+function testPeonNegro(tablero, allowPlay, Py, Px, y, x) { 
+  if(Px != x || Py < y || tablero[Py - 1][Px] != 0 || tablero[y][x] != 0 || ((Py - y) > 1))allowPlay = false;  
+  if(Py == 6 && y == 4 && tablero[5][x] == 0)allowPlay = true;    
+  if((y == Py - 1 && x == Px + 1) && tablero[Py - 1][Px + 1].color == 0)allowPlay = true;     
+  if((y == Py - 1 && x == Px - 1) && tablero[Py - 1][Px - 1].color == 0)allowPlay = true;     
+  return allowPlay;
+}
+
+//TORRES
+function testTorres(tablero, allowPlay, Py, Px, y, x, color) { 
+  if(Py != y && Px != x)allowPlay = false;//DIAGONAL OFF
+  if(allowPlay){
+      //PALANTE
+      if(Py < y){
+          let m = Py;
+          while(m < y){
+              m++;
+              if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
+          }
+      }
+      //PATRAS
+      if(Py > y){
+          let m = Py;
+          while(m > y){
+              m--;
+              if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
+          }
+      }
+      //IZQUIERDA
+      if(Px > x){
+          let m = Px;
+          while(m > x){
+              m--;
+              if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
+          }
+      }
+      //DERECHA
+      if(Px < x){
+          let m = Px;
+          while(m < x){
+              m++;
+              if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
+          }
+      }
+  }
+  if(allowPlay)tablero[Py][Px].used = true; //Cancelamos el enroque
+  return allowPlay;
+}
+
+//ALFILES
+function testAlfiles(tablero, allowPlay, Py, Px, y, x, color){
+  let Mx = x;
+  let My = y;
+  if(y + Px == x + Py){
+      if(y > Py){
+          while(Mx != Px){
+              if(tablero[My][Mx].color == color)allowPlay = false;
+              Mx--;
+              My--;
+          }
+      }
+      if(y < Py){
+          while(Mx != Px){
+              if(tablero[My][Mx].color == color)allowPlay = false;
+              Mx++;
+              My++;
+          }
+      }   
+  } else if (Math.abs(y - Px) == Math.abs(x - Py)) {
+      if(y > Py){
+          while(Mx != Px){
+              if(tablero[My][Mx].color == color)allowPlay = false;
+              Mx++;
+              My--;
+          }
+      }
+      if(y < Py){
+          while(Mx != Px){
+              if(tablero[My][Mx].color == color)allowPlay = false;
+              Mx--;
+              My++;
+          }
+      }   
+
+  } else {
+      allowPlay = false;
+  }
+
+  return allowPlay;
+}
+
+//DAMAS
+function testDamas(tablero, allowPlay, Py, Px, y, x, color){
+  let diagonalOrecto;
+  if(Py == y && Px != x || Px == x && Py != y)diagonalOrecto = false;
+  if(y + Px == x + Py || (Math.abs(y - Px) == Math.abs(x - Py)))diagonalOrecto = true;
+  if(diagonalOrecto)allowPlay = testAlfiles(tablero, allowPlay, Py, Px, y, x, color);
+  if(!diagonalOrecto)allowPlay = testTorres(tablero, allowPlay, Py, Px, y, x, color);
+  if(diagonalOrecto == undefined)allowPlay = false;
+  return allowPlay;
+}
+
+//CABALLOS
+function testCaballos(tablero, allowPlay, Py, Px, y, x, color) {
+  allowPlay = false;
+  if((Py + 2 == y || Py - 2 == y ) && (Px + 1 == x || Px - 1 == x))allowPlay = true;
+  if((Px + 2 == x || Px - 2 == x ) && (Py + 1 == y || Py - 1 == y))allowPlay = true;
+  if(tablero[y][x].color == "blanco")allowPlay = false;    
+  return allowPlay;
+}
+
 
