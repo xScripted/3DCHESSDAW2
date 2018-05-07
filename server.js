@@ -280,6 +280,10 @@ function testCaballos(tablero, allowPlay, Py, Px, y, x, color) {
   return allowPlay;
 }
 
+//REY
+function testReyes(){
+
+}
 
 
 
