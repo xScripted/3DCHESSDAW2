@@ -17,6 +17,17 @@ window.onload = () => {
     init();
 }
 
+//Socket IO
+socket.on('testReturned', (returned) => {            
+    if(returned.move){
+        piecesOBJ[returned.mv.y1][returned.mv.x1].position.x = returned.mv.x2;
+        piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
+        piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
+        piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
+    }            
+})
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 function init() {
     //Obtenim les dimensions del contenidor tablero3D
     width  = board3D.clientWidth;
@@ -177,7 +188,6 @@ function renderCasting() {
             old.material.emissive.setHex(0xff0000);
         }
         if(intersects[0].object.tipo == "board"){
-            console.log("room",room);
             socket.emit('test', {
                 x1: old.position.x, 
                 y1: old.position.z, 
@@ -185,15 +195,6 @@ function renderCasting() {
                 y2: intersects[0].object.position.z, 
                 room: room
             }); //Enviem les coordenades i color al servidor
-            socket.on('testReturned', (returned) => {                
-                if(returned.move){
-                    console.log("entra", returned, piecesOBJ);
-                    piecesOBJ[returned.mv.y1][returned.mv.x1].position.x = returned.mv.x2;
-                    piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
-                    piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
-                    piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
-                }            
-            })
             old.material.emissive.setHex(0x000000);
             //old.position.x = intersects[0].object.position.x;
             //old.position.z = intersects[0].object.position.z;

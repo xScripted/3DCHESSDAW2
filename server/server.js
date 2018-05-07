@@ -47,7 +47,6 @@ function checkMove(socket, mv) {
     for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board;
   }
   returned['cl'] = obj;
-  console.log(mv.room);
   io.to(mv.room).emit('testReturned', returned);
 }
 
@@ -280,5 +279,7 @@ function testCaballos(tablero, allowPlay, Py, Px, y, x, color) {
   if(tablero[y][x].color == "blanco")allowPlay = false;    
   return allowPlay;
 }
+
+
 
 
