@@ -34,6 +34,7 @@ function checkMove(socket, mv) {
   if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
   if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
   if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+  if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
 
   //Comprobar torn
   //if(socket.id == obj.ids[obj.turn] && obj.board[mv.y1][mv.x1].color == obj.turn){ //Comprobar Torn && Color            
@@ -179,6 +180,7 @@ function testPeonNegro(tablero, allowPlay, Py, Px, y, x) {
 
 //TORRES
 function testTorres(tablero, allowPlay, Py, Px, y, x, color) { 
+  let anti = color == 0 ? 1 : 0;
   if(Py != y && Px != x)allowPlay = false;//DIAGONAL OFF
   if(allowPlay){
       //PALANTE
@@ -222,37 +224,41 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
 function testAlfiles(tablero, allowPlay, Py, Px, y, x, color){
   let Mx = x;
   let My = y;
-  if(y + Px == x + Py){
-      if(y > Py){
+  let anti = color == 0 ? 1 : 0;
+  if(y + Px == x + Py){ // Diagonal
+      if(y > Py){ // Diagonal positiva dreta
           while(Mx != Px){
               if(tablero[My][Mx].color == color)allowPlay = false;
+              if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
               Mx--;
               My--;
           }
       }
-      if(y < Py){
+      if(y < Py){ // Diagonal negativa esquerra
           while(Mx != Px){
               if(tablero[My][Mx].color == color)allowPlay = false;
+              if(tablero[My][Mx].color == anti && Mx > x)allowPlay = false; // No traspas
               Mx++;
               My++;
           }
       }   
   } else if (Math.abs(y - Px) == Math.abs(x - Py)) {
-      if(y > Py){
+      if(y > Py){ // Diagonal negativa dreta
           while(Mx != Px){
               if(tablero[My][Mx].color == color)allowPlay = false;
+              if(tablero[My][Mx].color == anti && Mx > x)allowPlay = false; // No traspas
               Mx++;
               My--;
           }
       }
-      if(y < Py){
+      if(y < Py){// Diagonal positiva esquerra
           while(Mx != Px){
               if(tablero[My][Mx].color == color)allowPlay = false;
+              if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
               Mx--;
               My++;
           }
       }   
-
   } else {
       allowPlay = false;
   }
@@ -281,8 +287,10 @@ function testCaballos(tablero, allowPlay, Py, Px, y, x, color) {
 }
 
 //REY
-function testReyes(){
-
+function testReyes(tablero, allowPlay, Py, Px, y, x, color){
+  allowPlay = false;
+  if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
+  return allowPlay;
 }
 
 
