@@ -11,6 +11,7 @@ var color1 = "#FFEEC7", color2 = "#FFB300";
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(), old;
 var texture = new THREE.TextureLoader().load('img/wood5.png');//Textura
+var mv;
 
 // MAIN
 window.onload = () => {
@@ -21,10 +22,7 @@ window.onload = () => {
 //Socket IO
 socket.on('testReturned', (returned) => {            
     if(returned.move){
-        piecesOBJ[returned.mv.y1][returned.mv.x1].position.x = returned.mv.x2;
-        piecesOBJ[returned.mv.y1][returned.mv.x1].position.z = returned.mv.y2;
-        piecesOBJ[returned.mv.y2][returned.mv.x2] = piecesOBJ[returned.mv.y1][returned.mv.x1];
-        piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
+        mv = returned.mv;
     }            
 })
 
@@ -80,11 +78,6 @@ function init() {
     );
 
     ///////////////////////////*/
-
-    //PRUEBAS TEXTO
-
-    /////////////////////////7
-
 
     //Llums !
     scene.background = new THREE.Color(bgimg); //BackgroundColor
@@ -163,10 +156,10 @@ function genPieces() {
     var loader = new THREE.ObjectLoader();
     for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 1, x, white)); //Peons blancs
     for(let x = 0; x < 8; x++)loader.load("models/set2/pawn.json", (obj) => bornPiece(obj, 6, x, black)); //Peons negres
-    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 0, 1, white)); //Cavalls blancs
-    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 0, 6, white)); //Cavalls blancs
-    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 1, black)); //Cavalls negres
-    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 6, black)); //Cavalls negres
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 0, 1, white, "knight")); //Cavalls blancs
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 0, 6, white, "knight")); //Cavalls blancs
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 1, black, "knight")); //Cavalls negres
+    loader.load("models/set2/knight.json", (obj) => bornPiece(obj, 7, 6, black, "knight")); //Cavalls negres
 
     loader.load("models/set2/tower.json",  (obj) => bornPiece(obj, 0, 0, white)); //Torres blancs
     loader.load("models/set2/tower.json",  (obj) => bornPiece(obj, 0, 7, white)); //Torres blancs
@@ -183,18 +176,42 @@ function genPieces() {
     loader.load("models/set2/king.json",   (obj) => bornPiece(obj, 0, 3, white)); //Reina blanc
     loader.load("models/set2/king.json",   (obj) => bornPiece(obj, 7, 3, black)); //Reina negre
 }
-function bornPiece(obj,z,x,color) {
+function bornPiece(obj,z,x,color,raza = "default") {
     obj.material.color = color;
     if(color.r == 0.2)obj.rotation.y = 85;
     obj.position.z = z;
     obj.position.x = x;
     obj["tipo"] = "piece";
+    obj["raza"] = raza;
     obj["nameColor"] = color.r == 1 ? "white" : "black"; // Pasem rbg a nom normal per fer la distincio;
     piecesOBJ[z][x] = obj;
     scene.add(obj);
 }
 function animate(){
-    requestAnimationFrame(animate);  //Fa la funcio d'un setInterval
+    requestAnimationFrame(animate);  //Fa la funcio d'un setInterval     
+    if(typeof(mv) === "object"){
+        if(piecesOBJ[mv.y1][mv.x1].position.z < mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z + 0.1) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.x < mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x + 0.1) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.z > mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z - 0.1) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.x > mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x - 0.1) * 10) / 10;
+
+        //Cavall Salt
+        if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && mv.horseUp){
+            piecesOBJ[mv.y1][mv.x1].position.y += 0.5; // Pujada
+            if(piecesOBJ[mv.y1][mv.x1].position.y >= 5)mv.horseUp = false; // Punt maxim i baixada
+        }else if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && piecesOBJ[mv.y1][mv.x1].position.y > 1) {
+            piecesOBJ[mv.y1][mv.x1].position.y -= 0.5; // Baixada
+        }
+
+        //Animacio finalitzada
+        if(Math.floor(piecesOBJ[mv.y1][mv.x1].position.z) == mv.y2 && Math.floor(piecesOBJ[mv.y1][mv.x1].position.x) == mv.x2){
+            console.log(piecesOBJ[mv.y1][mv.x1].position);
+            //Reposicionar
+            piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];
+            piecesOBJ[mv.y1][mv.x1] = 0;
+            mv = 0;
+        }
+    }
     renderer.render(scene, camera); //Renderitza l'escena a 60 frames 
 }
 
@@ -232,11 +249,10 @@ function renderCasting() {
                 y1: old.position.z, 
                 x2: intersects[0].object.position.x, 
                 y2: intersects[0].object.position.z, 
-                room: room
+                room: room,
+                horseUp: true
             }); //Enviem les coordenades i color al servidor
             old.material.emissive.setHex(0x000000);
-            //old.position.x = intersects[0].object.position.x;
-            //old.position.z = intersects[0].object.position.z;
             old = null;
         }
     }
@@ -250,7 +266,7 @@ function reloadPieces() {
 
 function loadNames(ids) {
     var loader = new THREE.FontLoader();
-    var material = new THREE.MeshBasicMaterial({color: "orange"});
+    var material = new THREE.MeshBasicMaterial({color: "black"});
 
     loader.load( 'helvetiker_regular.typeface.json', (font) => {
         var geometry = new THREE.TextGeometry( `User${ids[0].slice(0,3)}`, {

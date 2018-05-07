@@ -22,19 +22,21 @@ io.on('connection', (socket) => {
 });
 
 function checkMove(socket, mv) {
-  let obj; 
+  let obj = 0; 
   var returned = {
     move: true,
-    mv: mv
+    mv: mv,
   }
   for(let x of listaPartidas)if(x.name == mv.room)obj = x;
-  if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 0)returned.move = testPeonBlanco(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON B
-  if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 1)returned.move = testPeonNegro (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON N   
-  if(obj.board[mv.y1][mv.x1].tipo == "torre")returned.move = testTorres(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST TORRE B&N
-  if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
-  if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
-  if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
-  if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+  if(obj != 0){ // Error undefined
+    if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 0)returned.move = testPeonBlanco(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON B
+    if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 1)returned.move = testPeonNegro (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON N   
+    if(obj.board[mv.y1][mv.x1].tipo == "torre")returned.move = testTorres(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST TORRE B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+  }
 
   //Comprobar torn
   //if(socket.id == obj.ids[obj.turn] && obj.board[mv.y1][mv.x1].color == obj.turn){ //Comprobar Torn && Color            
