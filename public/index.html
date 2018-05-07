@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Chess Miquel Toran</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="img/peon.png" />
+    <link rel="stylesheet" href="css/css.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
+    <script type="text/javascript" charset="utf8" src="Javascript/client.js"></script>
+    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/three.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/OrbitControls.js"></script>
+    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/TextureLoader.js"></script>
+    <script type="text/javascript" charset="utf8" src="Javascript/three.js"></script>
+</head>
+<body>
+    <!-- MENU -->
+    <div id="menu">
+        <div><img src="img/jugar.png"><b>Jugar</b></div>
+        <div><img src="img/modo.png"><b>Modo</b></div>
+        <div><img src="img/ccolor.png"><b>Cambiar Colores</b></div>
+        <div><img src="img/multiplayer.png"><b>Multiplayer</b></div>
+    </div>
+    <div id="menu2">
+        <div id="colorAll" class="menu2">
+            <p>Color Principal</p>
+            <input type="color" id="inputColor">
+            <p>Color Tablero</p>
+            <input type="color" id="inputColor2">
+        </div>
+        <div id="modos" class="menu2">
+            <div>Normal</div>
+            <div>Spin</div>
+            <div>Random</div>
+        </div>
+    </div>
+     <!-- ////////// -->
+    <div id="chess">
+        <div id="board3D"></div>
+    </div>
+    <div id="multiplayer">
+        <div id="crearysalir">
+            <input type="button" name="Crear" value="Crear Sala">
+            <input type="button" name="Salir" value="Salir">
+        </div>
+        <div id="taula"></div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
