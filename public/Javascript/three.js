@@ -27,6 +27,18 @@ socket.on('testReturned', (returned) => {
         piecesOBJ[returned.mv.y1][returned.mv.x1] = 0;
     }            
 })
+
+socket.on('newGame', (ids) => {
+    reloadPieces();
+    room = ids[0]; //Guardem en quina room esta       
+    chess.style.display = 'block'; 
+    multiplayer.style.display = 'none';
+    if(j1){
+        loadNames(ids);
+    } else {
+        loadNames(ids);
+    }
+})
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function init() {
@@ -68,6 +80,10 @@ function init() {
     );
 
     ///////////////////////////*/
+
+    //PRUEBAS TEXTO
+
+    /////////////////////////7
 
 
     //Llums !
@@ -230,4 +246,35 @@ window.addEventListener('click', onClick, false);
 
 function reloadPieces() {
 
+}
+
+function loadNames(ids) {
+    var loader = new THREE.FontLoader();
+    var material = new THREE.MeshBasicMaterial({color: "orange"});
+
+    loader.load( 'helvetiker_regular.typeface.json', (font) => {
+        var geometry = new THREE.TextGeometry( `User${ids[0].slice(0,3)}`, {
+            font: font,
+            size: 1,
+            height: 0.1,
+            curveSegments: 20,
+        });    
+        var texto1 = new THREE.Mesh(geometry, material);
+        texto1.position.set(0, -0.5, 10);
+        texto1.rotateX(-90 * Math.PI / 180);
+
+        var geometry2 = new THREE.TextGeometry( `User${ids[1].slice(0,3)}`, {
+            font: font,
+            size: 1,
+            height: 0.1,
+            curveSegments: 20,
+        });
+        var texto2 = new THREE.Mesh(geometry2, material);
+        texto2.position.set(5, -0.5, -3);
+        texto2.rotateX(90 * Math.PI / 180);
+        texto2.rotateY(180 * Math.PI / 180);
+
+        scene.add(texto1);
+        scene.add(texto2);
+    });
 }

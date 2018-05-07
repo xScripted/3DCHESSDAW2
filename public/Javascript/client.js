@@ -23,21 +23,6 @@ function client() {
         });  
     })
 
-    socket.on('newGame', (ids) => {
-        reloadPieces();
-        room = ids[0]; //Guardem en quina room esta       
-        chess.style.display = 'block'; 
-        multiplayer.style.display = 'none';
-       /* let dvId = document.querySelectorAll(".nameId");
-        if(j1){
-            dvId[1].innerHTML = `User${ids[0].slice(0,3)}`;
-            dvId[0].innerHTML = `User${ids[1].slice(0,3)}`;
-        } else {
-            dvId[0].innerHTML = `User${ids[0].slice(0,3)}`;
-            dvId[1].innerHTML = `User${ids[1].slice(0,3)}`;
-        }*/
-    })
-
     //socket.on('tictoc', (times) => { //No funciona bien el orden
     //    timer1.innerHTML = toTimeSystem(times.t1);
     //    timer2.innerHTML = toTimeSystem(times.t2);
