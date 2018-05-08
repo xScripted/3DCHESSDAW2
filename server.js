@@ -35,7 +35,7 @@ function checkMove(socket, mv) {
     if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
     if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
     if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
-    if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N    
   }
 
   //Comprobar torn
@@ -44,13 +44,20 @@ function checkMove(socket, mv) {
 //  } else {
 //      returned.move = false;
 //  }       
-  if(returned.move){
+  if(returned.move && obj.jaqueActivo){
+    let tmp = obj.board;
+    tmp[mv.y2][mv.x2] = tmp[mv.y1][mv.x1];
+    tmp[mv.y1][mv.x1] = 0;
+    obj.jaqueActivo = testJaque(tmp);
+  }
+  if(returned.move && !(obj.jaqueActivo)){
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
-    for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board;
+    obj.jaqueActivo = testJaque(obj.board);
+    for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornem el tauler reposicionat
+    returned['cl'] = obj;
+    io.to(mv.room).emit('testReturned', returned);
   }
-  returned['cl'] = obj;
-  io.to(mv.room).emit('testReturned', returned);
 }
 
 function actualitzarTaula() {
@@ -62,7 +69,7 @@ function crearSala(socket){
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
     socket.join(socket.id); //Creem la sala 
-    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard(), time1: 600, time2: 600, turn: Math.floor(Math.random()*2)}); // Creem un objecte de la sala i la introduim al array de salas
+    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard(), jaqueActivo: false, time1: 600, time2: 600, turn: Math.floor(Math.random()*2)}); // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
     actualitzarTaula();
   }
@@ -157,7 +164,7 @@ class Pieza {
       this.url = "img/" + url; //Imagen
       this.tipo = tipo; //Peon, torre, reina, etc...
       this.coord = coord;
-      this.viva = true;
+      this.jaque = false;
       this.used = false; // Solo para torres
   }
 }
@@ -190,7 +197,12 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           let m = Py;
           while(m < y){
               m++;
-              if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
+              if(tablero[Py][Px].tipo == "rey"){
+                if(tablero[m][Px].color == color)break;
+                if(tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama" && tablero[m][Px].color == anti)return "jaque";
+              } else {
+                if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
+              }
           }
       }
       //PATRAS
@@ -216,7 +228,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
               m++;
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
           }
-      }
+      }      
   }
   if(allowPlay)tablero[Py][Px].used = true; //Cancelamos el enroque
   return allowPlay;
@@ -296,4 +308,24 @@ function testReyes(tablero, allowPlay, Py, Px, y, x, color){
 }
 
 
-
+//JAQUE
+function testJaque(tablero) {
+  //Localizamos rey1
+  for(let y in tablero){
+    for(let x in tablero){
+      if(tablero[y][x] != 0){
+        if(tablero[y][x].tipo == "rey"){
+          if(testTorres(tablero, true, y, x, 7, x, tablero[y][x].color) == "jaque"){
+            tablero[y][x].jaque = true;
+            console.log("!Jaque: " + tablero[y][x].jaque);
+            return true;
+          } 
+          //testTorre(tablero, allowPlay, y, x, 0, 0,color);
+          //testTorre(tablero, allowPlay, y, x, 0, 7,color);
+          //testTorre(tablero, allowPlay, y, x, 7, 0,color);
+        }
+      }
+    }
+  }
+  return false;
+}

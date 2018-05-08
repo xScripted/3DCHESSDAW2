@@ -198,13 +198,13 @@ function animate(){
         //Cavall Salt
         if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && mv.horseUp){
             piecesOBJ[mv.y1][mv.x1].position.y += 0.5; // Pujada
-            if(piecesOBJ[mv.y1][mv.x1].position.y >= 5)mv.horseUp = false; // Punt maxim i baixada
+            if(piecesOBJ[mv.y1][mv.x1].position.y >= 4)mv.horseUp = false; // Punt maxim i baixada
         }else if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && piecesOBJ[mv.y1][mv.x1].position.y > 1) {
             piecesOBJ[mv.y1][mv.x1].position.y -= 0.5; // Baixada
         }
 
         //Animacio finalitzada
-        if(Math.floor(piecesOBJ[mv.y1][mv.x1].position.z) == mv.y2 && Math.floor(piecesOBJ[mv.y1][mv.x1].position.x) == mv.x2){
+        if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2){
             console.log(piecesOBJ[mv.y1][mv.x1].position);
             //Reposicionar
             piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];
