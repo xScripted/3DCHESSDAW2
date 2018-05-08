@@ -205,7 +205,6 @@ function animate(){
 
         //Animacio finalitzada
         if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2){
-            console.log(piecesOBJ[mv.y1][mv.x1].position);
             //Reposicionar
             piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];
             piecesOBJ[mv.y1][mv.x1] = 0;

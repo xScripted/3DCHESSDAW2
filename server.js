@@ -58,6 +58,9 @@ function checkMove(socket, mv) {
     returned['cl'] = obj;
     io.to(mv.room).emit('testReturned', returned);
   }
+
+  //Helper
+  io.to(mv.room).emit('helper', obj);
 }
 
 function actualitzarTaula() {
@@ -197,12 +200,11 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           let m = Py;
           while(m < y){
               m++;
-              if(tablero[Py][Px].tipo == "rey"){
+              if(tablero[Py][Px].tipo == "rey"){    
                 if(tablero[m][Px].color == color)break;
                 if(tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama" && tablero[m][Px].color == anti)return "jaque";
-              } else {
-                if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
               }
+              if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;            
           }
       }
       //PATRAS
