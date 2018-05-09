@@ -23,6 +23,7 @@ io.on('connection', (socket) => {
 
 function checkMove(socket, mv) {
   let obj = 0; 
+  let autojaque;
   var returned = {
     move: true,
     mv: mv,
@@ -44,21 +45,32 @@ function checkMove(socket, mv) {
 //  } else {
 //      returned.move = false;
 //  }       
-  if(returned.move && obj.jaqueActivo){
+//Jaque 0 = blanca, 1 = negra, 2 = no
+
+  if(returned.move && obj.jaqueActivo != 2){
+    //Fem la prediccio del proxim moviment
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
-    obj.jaqueActivo = testJaque(obj.board);
+    obj.jaqueActivo = testJaque(obj.board, obj.board[mv.y2][mv.x2].color); //Comprobem si es jaque
+    //Ho deixem com estaba 
     obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
     obj.board[mv.y2][mv.x2] = 0;
   }
-  if(returned.move && !(obj.jaqueActivo)){
+  if(returned.move && obj.jaqueActivo == 2){
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
     obj.jaqueActivo = testJaque(obj.board);
-    for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornem el tauler reposicionat
-    returned['cl'] = obj;
-    io.to(mv.room).emit('testReturned', returned);
-  }
+    autojaque = obj.jaqueActivo == obj.board[mv.y2][mv.x2].color ? true : false;
+    if(autojaque){
+      //Ho deixem com estaba 
+      obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
+      obj.board[mv.y2][mv.x2] = 0;
+    } else {
+      for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornem el tauler reposicionat
+      returned['cl'] = obj; //No me acuerdo para que sirve esto
+      io.to(mv.room).emit('testReturned', returned);
+    }
+  }   
 
   console.log("Jaque: " + obj.jaqueActivo);
   //Helper
@@ -74,7 +86,7 @@ function crearSala(socket){
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
     socket.join(socket.id); //Creem la sala 
-    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard(), jaqueActivo: false, time1: 600, time2: 600, turn: Math.floor(Math.random()*2)}); // Creem un objecte de la sala i la introduim al array de salas
+    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard(), jaqueActivo: 2, time1: 600, time2: 600, turn: Math.floor(Math.random()*2)}); // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
     actualitzarTaula();
   }
@@ -203,7 +215,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           while(m < y){
               m++;
               if(tablero[Py][Px].tipo == "rey"){    
-                if(tablero[m][Px].color == color)break;
+                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0)break;
                 if(tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama" && tablero[m][Px].color == anti)return "jaque";
               }
               if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;            
@@ -214,6 +226,10 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           let m = Py;
           while(m > y){
               m--;
+              if(tablero[Py][Px].tipo == "rey"){    
+                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0)break;
+                if(tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama" && tablero[m][Px].color == anti)return "jaque";
+              }
               if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
           }
       }
@@ -222,6 +238,10 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           let m = Px;
           while(m > x){
               m--;
+              if(tablero[Py][Px].tipo == "rey"){    
+                if(tablero[Py][m].tipo != "torre" && tablero[Py][m].tipo != "dama" && tablero[Py][m] != 0)break;
+                if(tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama" && tablero[Py][m].color == anti)return "jaque";
+              }
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
           }
       }
@@ -230,6 +250,10 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           let m = Px;
           while(m < x){
               m++;
+              if(tablero[Py][Px].tipo == "rey"){    
+                if(tablero[Py][m].tipo != "torre" && tablero[Py][m].tipo != "dama" && tablero[Py][m] != 0)break;
+                if(tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama" && tablero[Py][m].color == anti)return "jaque";
+              }
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
           }
       }      
@@ -243,9 +267,15 @@ function testAlfiles(tablero, allowPlay, Py, Px, y, x, color){
   let Mx = x;
   let My = y;
   let anti = color == 0 ? 1 : 0;
-  if(y + Px == x + Py){ // Diagonal
+  Py = parseInt(Py); //No entiendo porque Py y Px son strings
+  Px = parseInt(Px);
+  if(y + Px == x + Py){ // Detectar diagonal
       if(y > Py){ // Diagonal positiva dreta
-          while(Mx != Px){
+          while(Mx != Px){                 
+              if(tablero[Py][Px].tipo == "rey"){  
+                if(tablero[My][Mx].tipo != "alfil" && tablero[My][Mx].tipo != "dama" && tablero[My][Mx] != 0)break;
+                if(tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama" && tablero[My][Mx].color == anti)return "jaque";
+              }
               if(tablero[My][Mx].color == color)allowPlay = false;
               if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
               Mx--;
@@ -313,18 +343,24 @@ function testReyes(tablero, allowPlay, Py, Px, y, x, color){
 
 //JAQUE
 function testJaque(tablero) {
-  //Localizamos rey1
+  let dy = 0, dx = 0;
+  //Localizamos reyes
   for(let y in tablero){
     for(let x in tablero){
       if(tablero[y][x] != 0){
         if(tablero[y][x].tipo == "rey"){
-          if(testTorres(tablero, true, y, x, 7, x, tablero[y][x].color) == "jaque"){
-            tablero[y][x].jaque = true;
-            return true;
-          } 
+          if(testTorres(tablero, true, y, x, 7, x, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
+          if(testTorres(tablero, true, y, x, 0, x, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
+          if(testTorres(tablero, true, y, x, y, 7, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
+          if(testTorres(tablero, true, y, x, y, 0, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;       
+          dx = x - y + 7;
+          dy = y - x + 7;       
+          dx = dx > 7 ? 7 : dx;
+          dy = dy > 7 ? 7 : dy;
+          if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;              
         }
       }
     }
   }
-  return false;
+  return 2;
 }
