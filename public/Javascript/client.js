@@ -24,7 +24,7 @@ function client() {
     })
 
     socket.on('helper', (obj) => {
-        console.log(obj);
+        console.table(obj.board);
     })
     //socket.on('tictoc', (times) => { //No funciona bien el orden
     //    timer1.innerHTML = toTimeSystem(times.t1);

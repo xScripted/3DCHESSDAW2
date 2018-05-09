@@ -45,10 +45,11 @@ function checkMove(socket, mv) {
 //      returned.move = false;
 //  }       
   if(returned.move && obj.jaqueActivo){
-    let tmp = obj.board;
-    tmp[mv.y2][mv.x2] = tmp[mv.y1][mv.x1];
-    tmp[mv.y1][mv.x1] = 0;
-    obj.jaqueActivo = testJaque(tmp);
+    obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
+    obj.board[mv.y1][mv.x1] = 0;
+    obj.jaqueActivo = testJaque(obj.board);
+    obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
+    obj.board[mv.y2][mv.x2] = 0;
   }
   if(returned.move && !(obj.jaqueActivo)){
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
@@ -59,6 +60,7 @@ function checkMove(socket, mv) {
     io.to(mv.room).emit('testReturned', returned);
   }
 
+  console.log("Jaque: " + obj.jaqueActivo);
   //Helper
   io.to(mv.room).emit('helper', obj);
 }
@@ -309,7 +311,6 @@ function testReyes(tablero, allowPlay, Py, Px, y, x, color){
   return allowPlay;
 }
 
-
 //JAQUE
 function testJaque(tablero) {
   //Localizamos rey1
@@ -319,12 +320,8 @@ function testJaque(tablero) {
         if(tablero[y][x].tipo == "rey"){
           if(testTorres(tablero, true, y, x, 7, x, tablero[y][x].color) == "jaque"){
             tablero[y][x].jaque = true;
-            console.log("!Jaque: " + tablero[y][x].jaque);
             return true;
           } 
-          //testTorre(tablero, allowPlay, y, x, 0, 0,color);
-          //testTorre(tablero, allowPlay, y, x, 0, 7,color);
-          //testTorre(tablero, allowPlay, y, x, 7, 0,color);
         }
       }
     }
