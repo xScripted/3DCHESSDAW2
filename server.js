@@ -216,7 +216,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
               m++;
               if(tablero[Py][Px].tipo == "rey"){    
                 if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0)break;
-                if(tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama" && tablero[m][Px].color == anti)return "jaque";
+                if((tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama") && tablero[m][Px].color == anti)return "jaque";
               }
               if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;            
           }
@@ -228,7 +228,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
               m--;
               if(tablero[Py][Px].tipo == "rey"){    
                 if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0)break;
-                if(tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama" && tablero[m][Px].color == anti)return "jaque";
+                if((tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama") && tablero[m][Px].color == anti)return "jaque";
               }
               if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
           }
@@ -240,7 +240,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
               m--;
               if(tablero[Py][Px].tipo == "rey"){    
                 if(tablero[Py][m].tipo != "torre" && tablero[Py][m].tipo != "dama" && tablero[Py][m] != 0)break;
-                if(tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama" && tablero[Py][m].color == anti)return "jaque";
+                if((tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama") && tablero[Py][m].color == anti)return "jaque";
               }
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
           }
@@ -252,7 +252,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
               m++;
               if(tablero[Py][Px].tipo == "rey"){    
                 if(tablero[Py][m].tipo != "torre" && tablero[Py][m].tipo != "dama" && tablero[Py][m] != 0)break;
-                if(tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama" && tablero[Py][m].color == anti)return "jaque";
+                if((tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama") && tablero[Py][m].color == anti)return "jaque";
               }
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
           }
@@ -264,48 +264,64 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
 
 //ALFILES
 function testAlfiles(tablero, allowPlay, Py, Px, y, x, color){
+  let jaque = 2;
   let Mx = x;
   let My = y;
   let anti = color == 0 ? 1 : 0;
-  Py = parseInt(Py); //No entiendo porque Py y Px son strings
-  Px = parseInt(Px);
+  //console.log("PyPx:"+Py,Px+" y:" + y + " x:" + x);
   if(y + Px == x + Py){ // Detectar diagonal
       if(y > Py){ // Diagonal positiva dreta
-          while(Mx != Px){                 
+          while(Mx != Px){                
               if(tablero[Py][Px].tipo == "rey"){  
-                if(tablero[My][Mx].tipo != "alfil" && tablero[My][Mx].tipo != "dama" && tablero[My][Mx] != 0)break;
-                if(tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama" && tablero[My][Mx].color == anti)return "jaque";
+                if(tablero[My][Mx] != 0)jaque = 2; 
+                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
               }
               if(tablero[My][Mx].color == color)allowPlay = false;
               if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
               Mx--;
               My--;
           }
+          if(tablero[Py][Px].tipo == "rey")return jaque;
       }
       if(y < Py){ // Diagonal negativa esquerra
           while(Mx != Px){
+              if(tablero[Py][Px].tipo == "rey"){       
+                if(tablero[My][Mx] != 0)jaque = 2; 
+                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
+              }
               if(tablero[My][Mx].color == color)allowPlay = false;
               if(tablero[My][Mx].color == anti && Mx > x)allowPlay = false; // No traspas
               Mx++;
               My++;
           }
+          if(tablero[Py][Px].tipo == "rey")return jaque;        
       }   
   } else if (Math.abs(y - Px) == Math.abs(x - Py)) {
       if(y > Py){ // Diagonal negativa dreta
           while(Mx != Px){
+              if(tablero[Py][Px].tipo == "rey"){  
+                if(tablero[My][Mx] != 0)jaque = 2; 
+                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
+              }
               if(tablero[My][Mx].color == color)allowPlay = false;
               if(tablero[My][Mx].color == anti && Mx > x)allowPlay = false; // No traspas
               Mx++;
               My--;
           }
+          if(tablero[Py][Px].tipo == "rey")return jaque; 
       }
       if(y < Py){// Diagonal positiva esquerra
           while(Mx != Px){
+              if(tablero[Py][Px].tipo == "rey"){        
+                if(tablero[My][Mx] != 0)jaque = 2; 
+                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
+              }
               if(tablero[My][Mx].color == color)allowPlay = false;
               if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
               Mx--;
               My++;
           }
+          if(tablero[Py][Px].tipo == "rey")return jaque; 
       }   
   } else {
       allowPlay = false;
@@ -349,15 +365,28 @@ function testJaque(tablero) {
     for(let x in tablero){
       if(tablero[y][x] != 0){
         if(tablero[y][x].tipo == "rey"){
+          x = parseInt(x); // No deberia ser strings
+          y = parseInt(y);
           if(testTorres(tablero, true, y, x, 7, x, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
           if(testTorres(tablero, true, y, x, 0, x, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
           if(testTorres(tablero, true, y, x, y, 7, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
-          if(testTorres(tablero, true, y, x, y, 0, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;       
+          if(testTorres(tablero, true, y, x, y, 0, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
+          dy = y - x + 7;
           dx = x - y + 7;
-          dy = y - x + 7;       
-          dx = dx > 7 ? 7 : dx;
           dy = dy > 7 ? 7 : dy;
-          if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;              
+          dx = dx > 7 ? 7 : dx;
+          if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
+          dy = y - x;
+          dx = x - y;
+          dy = dy < 0 ? 0 : dy;
+          dx = dx < 0 ? 0 : dx;
+          if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
+          dy = y + x;
+          dx = y + x - 7;
+          dx = dx < 0 ? 0 : dx;
+          dy = dy > 7 ? 7 : dy;
+          if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
+          if(testAlfiles(tablero, true, y, x, dx, dy, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
         }
       }
     }
