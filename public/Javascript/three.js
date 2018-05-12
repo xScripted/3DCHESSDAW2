@@ -12,7 +12,7 @@ var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(), old;
 var texture = new THREE.TextureLoader().load('img/wood5.png');//Textura
 var mv;
-
+var wz = 2, bz = 5, wx = 9, bx = 9;
 // MAIN
 window.onload = () => {
     client();
@@ -20,10 +20,30 @@ window.onload = () => {
 }
 
 //Socket IO
-socket.on('testReturned', (returned) => {            
-    if(returned.move){
-        mv = returned.mv;
-    }            
+socket.on('testReturned', (returned) => {         
+    if(returned.move && returned.kill){
+        if(piecesOBJ[returned.mv.y2][returned.mv.x2].nameColor == "black"){
+            piecesOBJ[returned.mv.y2][returned.mv.x2].position.x = wx;
+            piecesOBJ[returned.mv.y2][returned.mv.x2].position.y -= 0.3;
+            piecesOBJ[returned.mv.y2][returned.mv.x2].position.z = wz;
+            if(wz == 0){
+                wz = 3;
+                wx++; 
+            }
+            wz--;
+        }
+        if(piecesOBJ[returned.mv.y2][returned.mv.x2].nameColor == "white"){
+            piecesOBJ[returned.mv.y2][returned.mv.x2].position.x = bx;
+            piecesOBJ[returned.mv.y2][returned.mv.x2].position.y -= 0.3;
+            piecesOBJ[returned.mv.y2][returned.mv.x2].position.z = bz;
+            if(bz == 7){
+                bz = 4;
+                bx++; 
+            }
+            bz++;
+        }
+    }
+    if(returned.move)mv = returned.mv;
 })
 
 socket.on('newGame', (ids) => {
@@ -237,6 +257,7 @@ function onClick(event) {
 function renderCasting() {
     raycaster.setFromCamera(mouse, camera); // update the picking ray with the camera and mouse position
     var intersects = raycaster.intersectObjects(scene.children);// calculate objects intersecting the picking ray
+    for(let y of piecesOBJ)for(let x of y)if(x != 0)x.material.emissive.setHex(0x000000);
     if(intersects.length > 0){
         if(intersects[0].object.tipo == "piece"){    
             old = intersects[0].object;        

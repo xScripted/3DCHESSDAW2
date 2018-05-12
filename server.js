@@ -27,6 +27,7 @@ function checkMove(socket, mv) {
   var returned = {
     move: true,
     mv: mv,
+    kill: false
   }
   for(let x of listaPartidas)if(x.name == mv.room)obj = x;
   if(obj != 0){ // Error undefined
@@ -52,13 +53,14 @@ function checkMove(socket, mv) {
     //Hacemos la prediccion del proximo movimiento
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
-    obj.jaqueActivo = testJaque(obj.board, obj.board[mv.y2][mv.x2].color); //Comprobamos si es jaque
+    obj.jaqueActivo = testJaque(obj.board); //Comprobamos si es jaque
     //Lo dejamos como estaba
     obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
     obj.board[mv.y2][mv.x2] = 0;
   }
   //Si no hay jaque
   if(returned.move && obj.jaqueActivo == 2){
+    if(obj.board[mv.y2][mv.x2] != 0)returned.kill = true;
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
     obj.jaqueActivo = testJaque(obj.board);
@@ -421,4 +423,9 @@ function testJaque(tablero) {
     }
   }
   return 2;
+}
+
+//JAQUE MATE
+function testMate(tablero, color) {
+  console.log("Color:",color);
 }
