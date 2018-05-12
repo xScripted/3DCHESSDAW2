@@ -36,42 +36,43 @@ function checkMove(socket, mv) {
     if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
     if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
     if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
-    if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N    
+    if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST REYES B&N    
   }
 
-  //Comprobar torn
-  //if(socket.id == obj.ids[obj.turn] && obj.board[mv.y1][mv.x1].color == obj.turn){ //Comprobar Torn && Color            
- ///     obj.turn = obj.turn == 0 ? 1 : 0; //Toggle                
-//  } else {
-//      returned.move = false;
-//  }       
-//Jaque 0 = blanca, 1 = negra, 2 = no
+  /*Comprobar torn
+  if(socket.id == obj.ids[obj.turn] && obj.board[mv.y1][mv.x1].color == obj.turn){ //Comprobar Torn && Color            
+     obj.turn = obj.turn == 0 ? 1 : 0; //Toggle                
+  } else {
+      returned.move = false;
+  }*/    
 
+  //Jaque 0 = blanca, 1 = negra, 2 = no
+  //Si hay jaque
   if(returned.move && obj.jaqueActivo != 2){
-    //Fem la prediccio del proxim moviment
+    //Hacemos la prediccion del proximo movimiento
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
-    obj.jaqueActivo = testJaque(obj.board, obj.board[mv.y2][mv.x2].color); //Comprobem si es jaque
-    //Ho deixem com estaba 
+    obj.jaqueActivo = testJaque(obj.board, obj.board[mv.y2][mv.x2].color); //Comprobamos si es jaque
+    //Lo dejamos como estaba
     obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
     obj.board[mv.y2][mv.x2] = 0;
   }
+  //Si no hay jaque
   if(returned.move && obj.jaqueActivo == 2){
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
     obj.jaqueActivo = testJaque(obj.board);
     autojaque = obj.jaqueActivo == obj.board[mv.y2][mv.x2].color ? true : false;
     if(autojaque){
-      //Ho deixem com estaba 
+      //Lo dejamos como estaba
       obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
       obj.board[mv.y2][mv.x2] = 0;
     } else {
-      for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornem el tauler reposicionat
+      for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       io.to(mv.room).emit('testReturned', returned);
     }
   }   
-
   console.log("Jaque: " + obj.jaqueActivo);
   //Helper
   io.to(mv.room).emit('helper', obj);
@@ -268,7 +269,6 @@ function testAlfiles(tablero, allowPlay, Py, Px, y, x, color){
   let Mx = x;
   let My = y;
   let anti = color == 0 ? 1 : 0;
-  //console.log("PyPx:"+Py,Px+" y:" + y + " x:" + x);
   if(y + Px == x + Py){ // Detectar diagonal
       if(y > Py){ // Diagonal positiva dreta
           while(Mx != Px){                
@@ -344,18 +344,27 @@ function testDamas(tablero, allowPlay, Py, Px, y, x, color){
 //CABALLOS
 function testCaballos(tablero, allowPlay, Py, Px, y, x, color) {
   allowPlay = false;
+  y = y < 0 ? 0 : y;
+  y = y > 7 ? 7 : y;
+  x = x < 0 ? 0 : x;
+  x = x > 7 ? 7 : x;
+  let anti = color == 0 ? 1 : 0;
+  if(tablero[Py][Px].tipo == "rey")if(typeof(tablero[y][x] != "undefined") && tablero[y][x] != 0)if(tablero[y][x].tipo == "caballo" && tablero[y][x].color == anti)return "jaque";
   if((Py + 2 == y || Py - 2 == y ) && (Px + 1 == x || Px - 1 == x))allowPlay = true;
   if((Px + 2 == x || Px - 2 == x ) && (Py + 1 == y || Py - 1 == y))allowPlay = true;
-  if(tablero[y][x].color == "blanco")allowPlay = false;    
+  if(tablero[y][x].color == color)allowPlay = false;    
   return allowPlay;
 }
 
 //REY
 function testReyes(tablero, allowPlay, Py, Px, y, x, color){
+  let anti = color == 0 ? 1 : 0;
   allowPlay = false;
   if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
+  //Para que los reyes no se toquen entre si
+  for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
   return allowPlay;
-}
+} 
 
 //JAQUE
 function testJaque(tablero) {
@@ -367,6 +376,7 @@ function testJaque(tablero) {
         if(tablero[y][x].tipo == "rey"){
           x = parseInt(x); // No deberia ser strings
           y = parseInt(y);
+          //Test rectas
           if(testTorres(tablero, true, y, x, 7, x, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
           if(testTorres(tablero, true, y, x, 0, x, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
           if(testTorres(tablero, true, y, x, y, 7, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;    
@@ -375,6 +385,7 @@ function testJaque(tablero) {
           dx = x - y + 7;
           dy = dy > 7 ? 7 : dy;
           dx = dx > 7 ? 7 : dx;
+          //Test diagonales
           if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
           dy = y - x;
           dx = x - y;
@@ -386,7 +397,25 @@ function testJaque(tablero) {
           dx = dx < 0 ? 0 : dx;
           dy = dy > 7 ? 7 : dy;
           if(testAlfiles(tablero, true, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
-          if(testAlfiles(tablero, true, y, x, dx, dy, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color; 
+          if(testAlfiles(tablero, true, y, x, dx, dy, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          //Test Caballos
+          if(testCaballos(tablero, true, y, x, y + 2, x + 1, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y + 2, x - 1, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y + 1, x - 2, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y + 1, x + 2, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y - 1, x - 2, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y - 1, x + 2, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y - 2, x - 1, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          if(testCaballos(tablero, true, y, x, y - 2, x + 1, tablero[y][x].color) == "jaque")return tablero[y][x].jaque = tablero[y][x].color;
+          //Test Peones
+          if(tablero[y][x].color == 1){
+            if(y > 0 && x < 7)if(tablero[y-1][x+1].tipo == "peon" && tablero[y-1][x+1].color == 0)return tablero[y][x].jaque = 1;
+            if(y > 0 && x > 0)if(tablero[y-1][x-1].tipo == "peon" && tablero[y-1][x-1].color == 0)return tablero[y][x].jaque = 1;                                          
+          }
+          if(tablero[y][x].color == 0){
+            if(y < 7 && x < 7)if(tablero[y+1][x+1].tipo == "peon" && tablero[y+1][x+1].color == 1)return tablero[y][x].jaque = 0;
+            if(y < 7 && x > 0)if(tablero[y+1][x-1].tipo == "peon" && tablero[y+1][x-1].color == 1)return tablero[y][x].jaque = 0;                                          
+          }
         }
       }
     }
