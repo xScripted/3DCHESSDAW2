@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var enroque1 = false, enroque2 = false, enroque3 = false, enroque4 = false;
 
 server.listen(3000);
 
@@ -72,6 +73,14 @@ function checkMove(socket, mv) {
     } else {
       for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
       returned['cl'] = obj; //No me acuerdo para que sirve esto
+      //Enroque
+      obj.board[mv.y2][mv.x2].used = true;
+      if(enroque1){
+        obj.board[0][2] = obj.board[0][0];
+        obj.board[0][1] = obj.board[0][3];
+        obj.board[0][0] = 0;
+        obj.board[0][3] = 0;
+      }
       io.to(mv.room).emit('testReturned', returned);
     }
   }   
@@ -143,47 +152,43 @@ function initBoard(){
     for(let x = 0; x < 8; x++){     
       //Creating pieces
       //PAWNS
-      if(y == 1)tmp = buildPieza(y, x, "pb", "peonb.png", "peon", 0, tmp);  
-      if(y == 6)tmp = buildPieza(y, x, "pn", "peon.png", "peon", 1, tmp); 
+      if(y == 1)tmp = buildPieza(y, x, "peon", 0, tmp);  
+      if(y == 6)tmp = buildPieza(y, x, "peon", 1, tmp); 
 
       //TOWERS
-      if(y == 0 && (x == 0 || x == 7))tmp = buildPieza(y, x, "tb", "torreb.png", "torre", 0, tmp);
-      if(y == 7 && (x == 0 || x == 7))tmp = buildPieza(y, x, "tn", "torre.png", "torre", 1, tmp);
+      if(y == 0 && (x == 0 || x == 7))tmp = buildPieza(y, x, "torre", 0, tmp);
+      if(y == 7 && (x == 0 || x == 7))tmp = buildPieza(y, x, "torre", 1, tmp);
 
       //BISHOPS
-      if(y == 0 && (x == 2 || x == 5))tmp = buildPieza(y, x, "ab", "alfilb.png", "alfil", 0, tmp);
-      if(y == 7 && (x == 2 || x == 5))tmp = buildPieza(y, x, "an", "alfil.png", "alfil", 1, tmp);
+      if(y == 0 && (x == 2 || x == 5))tmp = buildPieza(y, x, "alfil", 0, tmp);
+      if(y == 7 && (x == 2 || x == 5))tmp = buildPieza(y, x, "alfil", 1, tmp);
 
       //KNIGHTS
-      if(y == 0 && (x == 1 || x == 6))tmp = buildPieza(y, x, "cb", "cabb.png", "caballo", 0, tmp);
-      if(y == 7 && (x == 1 || x == 6))tmp = buildPieza(y, x, "cn", "cab.png", "caballo", 1, tmp);
+      if(y == 0 && (x == 1 || x == 6))tmp = buildPieza(y, x, "caballo", 0, tmp);
+      if(y == 7 && (x == 1 || x == 6))tmp = buildPieza(y, x, "caballo", 1, tmp);
       
       //QUEEN
-      if(y == 0 && x == 4)tmp = buildPieza(y, x, "db", "damab.png", "dama", 0, tmp);
-      if(y == 7 && x == 4)tmp = buildPieza(y, x, "dn", "dama.png", "dama", 1, tmp);
+      if(y == 0 && x == 4)tmp = buildPieza(y, x, "dama", 0, tmp);
+      if(y == 7 && x == 4)tmp = buildPieza(y, x, "dama", 1, tmp);
 
       //KING
-      if(y == 0 && x == 3)tmp = buildPieza(y, x, "rb", "reyb.png", "rey", 0, tmp);
-      if(y == 7 && x == 3)tmp = buildPieza(y, x, "rn", "rey.png", "rey", 1, tmp);
+      if(y == 0 && x == 3)tmp = buildPieza(y, x, "rey", 0, tmp);
+      if(y == 7 && x == 3)tmp = buildPieza(y, x, "rey", 1, tmp);
     }    
   } 
   return tmp;
 }
 
 //Constructor de Piezas
-function buildPieza(y, x, id, url, tipo, color, tmp){
-  tmp[y][x] = new Pieza(id + x, (y + "," + x), url,  tipo, color);
+function buildPieza(y, x, tipo, color, tmp){
+  tmp[y][x] = new Pieza(tipo, color);
   return tmp;
 }
 
-//Temporal
 class Pieza {
-  constructor(id, coord, url, tipo, color){
-      this.id = id;
+  constructor(tipo, color){
       this.color = color;
-      this.url = "img/" + url; //Imagen
       this.tipo = tipo; //Peon, torre, reina, etc...
-      this.coord = coord;
       this.jaque = false;
       this.used = false; // Solo para torres
   }
@@ -363,8 +368,16 @@ function testReyes(tablero, allowPlay, Py, Px, y, x, color){
   let anti = color == 0 ? 1 : 0;
   allowPlay = false;
   if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
+  //Enroque
+  //if(tablero[Py][0].tipo == "torre" && !(tablero[Py][0].used) && tablero[Py][1] == 0 && tablero[Py][2] == 0 && x == 1 && (y == 0 || y == 7)){
+   // console.log("Enroque test");
+    //allowPlay = true;
+    //if(Py == 0)enroque1 = true;
+    //if(Py == 7)enroque2 = true;
+ // }
+
   //Para que los reyes no se toquen entre si
-  for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
+  for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(ty >= 0 && ty <= 7)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
   return allowPlay;
 } 
 
