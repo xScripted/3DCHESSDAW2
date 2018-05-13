@@ -13,6 +13,7 @@ var mouse = new THREE.Vector2(), old;
 var texture = new THREE.TextureLoader().load('img/wood5.png');//Textura
 var mv;
 var wz = 2, bz = 5, wx = 9, bx = 9;
+var enroqueC, enroqueL;
 // MAIN
 window.onload = () => {
     client();
@@ -45,6 +46,11 @@ socket.on('testReturned', (returned) => {
     }
     if(returned.move)mv = returned.mv;
 })
+
+socket.on('ec', (Py) => {
+    enroqueC = Py;
+    piecesOBJ[Py][2] = piecesOBJ[Py][0];
+});
 
 socket.on('newGame', (ids) => {
     reloadPieces();
@@ -156,7 +162,6 @@ function newBoard(){
     genPieces();  
 }
 
-
 function genSquare(y,x){
     var geometry = new THREE.BoxGeometry(1, 0.5, 1);     //Tamany
     var color = (x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0) ? color1 : color2;     //Colors alternatius
@@ -196,6 +201,7 @@ function genPieces() {
     loader.load("models/set2/king.json",   (obj) => bornPiece(obj, 0, 3, white)); //Reina blanc
     loader.load("models/set2/king.json",   (obj) => bornPiece(obj, 7, 3, black)); //Reina negre
 }
+
 function bornPiece(obj,z,x,color,raza = "default") {
     obj.material.color = color;
     if(color.r == 0.2)obj.rotation.y = 85;
@@ -215,15 +221,24 @@ function animate(){
         if(piecesOBJ[mv.y1][mv.x1].position.z > mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z - 0.1) * 10) / 10;
         if(piecesOBJ[mv.y1][mv.x1].position.x > mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x - 0.1) * 10) / 10;
 
-        //Cavall Salt
+        //Caballo Salto
         if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && mv.horseUp){
             piecesOBJ[mv.y1][mv.x1].position.y += 0.5; // Pujada
             if(piecesOBJ[mv.y1][mv.x1].position.y >= 4)mv.horseUp = false; // Punt maxim i baixada
         }else if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && piecesOBJ[mv.y1][mv.x1].position.y > 1) {
             piecesOBJ[mv.y1][mv.x1].position.y -= 0.5; // Baixada
         }
+        //Enroque
+        if(enroqueC == 0){
+            piecesOBJ[0][2].position.x = Math.round((piecesOBJ[0][2].position.x + 0.1) * 10) / 10;
+            if(piecesOBJ[0][2].position.x == 2)enroqueC = 10;
+        }
+        if(enroqueC == 7){
+            piecesOBJ[7][2].position.x = Math.round((piecesOBJ[7][2].position.x + 0.1) * 10) / 10;
+            if(piecesOBJ[7][2].position.x == 2)enroqueC = 10;
+        }
 
-        //Animacio finalitzada
+        //Animacion finaltzada
         if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2){
             //Reposicionar
             piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];

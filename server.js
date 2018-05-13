@@ -3,7 +3,6 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var enroque1 = false, enroque2 = false, enroque3 = false, enroque4 = false;
 
 server.listen(3000);
 
@@ -34,11 +33,18 @@ function checkMove(socket, mv) {
   if(obj != 0){ // Error undefined
     if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 0)returned.move = testPeonBlanco(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON B
     if(obj.board[mv.y1][mv.x1].tipo == "peon" && obj.board[mv.y1][mv.x1].color == 1)returned.move = testPeonNegro (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON N   
-    if(obj.board[mv.y1][mv.x1].tipo == "torre")returned.move = testTorres(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST TORRE B&N
-    if(obj.board[mv.y1][mv.x1].tipo == "alfil")returned.move = testAlfiles(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
-    if(obj.board[mv.y1][mv.x1].tipo == "dama")returned.move = testDamas(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
-    if(obj.board[mv.y1][mv.x1].tipo == "caballo")returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
-    if(obj.board[mv.y1][mv.x1].tipo == "rey")returned.move = testReyes(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST REYES B&N    
+    if(obj.board[mv.y1][mv.x1].tipo == "torre")   returned.move = testTorres  (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST TORRE B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "alfil")   returned.move = testAlfiles (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST ALFIL B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "dama")    returned.move = testDamas   (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "caballo") returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
+    if(obj.board[mv.y1][mv.x1].tipo == "rey")     returned.move = testReyes   (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST REYES B&N    
+    //Enroque
+    if(obj.board[mv.y1][0].tipo == "torre" && !(obj.board[mv.y1][0].used) && obj.board[mv.y1][mv.x1].tipo == "rey" && 
+       obj.board[mv.y1][1] == 0 && obj.board[mv.y1][2] == 0 && mv.x2 == 1 && (mv.y2 == 0 || mv.y2 == 7)){
+      if(mv.y1 == 0)obj.board = enroqueCorto(obj.board, 0, mv.room);
+      if(mv.y1 == 7)obj.board = enroqueCorto(obj.board, 7, mv.room);
+      returned.move = true;
+    }
   }
 
   /*Comprobar torn
@@ -70,23 +76,24 @@ function checkMove(socket, mv) {
       //Lo dejamos como estaba
       obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
       obj.board[mv.y2][mv.x2] = 0;
-    } else {
-      for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
+    } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
-      //Enroque
       obj.board[mv.y2][mv.x2].used = true;
-      if(enroque1){
-        obj.board[0][2] = obj.board[0][0];
-        obj.board[0][1] = obj.board[0][3];
-        obj.board[0][0] = 0;
-        obj.board[0][3] = 0;
-      }
+      for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
       io.to(mv.room).emit('testReturned', returned);
     }
   }   
   console.log("Jaque: " + obj.jaqueActivo);
   //Helper
   io.to(mv.room).emit('helper', obj);
+}
+
+function enroqueCorto(tablero, Py, room){
+  //tablero[Py][2].used = true;
+  tablero[Py][2] = tablero[Py][0];
+  tablero[Py][0] = 0;
+  io.to(room).emit('ec', Py);
+  return tablero;
 }
 
 function actualitzarTaula() {
@@ -98,7 +105,18 @@ function crearSala(socket){
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
     socket.join(socket.id); //Creem la sala 
-    listaPartidas.push({name: socket.id, estat: "Esperant...", ids: new Array(), players: 1, board: initBoard(), jaqueActivo: 2, time1: 600, time2: 600, turn: Math.floor(Math.random()*2)}); // Creem un objecte de la sala i la introduim al array de salas
+    // Creem un objecte de la sala i la introduim al array de salas
+    listaPartidas.push({
+      name: socket.id, 
+      estat: "Esperando...", 
+      ids: new Array(), 
+      players: 1, 
+      board: initBoard(), 
+      jaqueActivo: 2, 
+      time1: 600, 
+      time2: 600, 
+      turn: Math.floor(Math.random()*2)
+    }); 
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
     actualitzarTaula();
   }
@@ -189,7 +207,6 @@ class Pieza {
   constructor(tipo, color){
       this.color = color;
       this.tipo = tipo; //Peon, torre, reina, etc...
-      this.jaque = false;
       this.used = false; // Solo para torres
   }
 }
@@ -368,14 +385,6 @@ function testReyes(tablero, allowPlay, Py, Px, y, x, color){
   let anti = color == 0 ? 1 : 0;
   allowPlay = false;
   if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
-  //Enroque
-  //if(tablero[Py][0].tipo == "torre" && !(tablero[Py][0].used) && tablero[Py][1] == 0 && tablero[Py][2] == 0 && x == 1 && (y == 0 || y == 7)){
-   // console.log("Enroque test");
-    //allowPlay = true;
-    //if(Py == 0)enroque1 = true;
-    //if(Py == 7)enroque2 = true;
- // }
-
   //Para que los reyes no se toquen entre si
   for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(ty >= 0 && ty <= 7)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
   return allowPlay;
