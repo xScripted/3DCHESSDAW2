@@ -240,7 +240,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           while(m < y){
               m++;
               if(tablero[Py][Px].tipo == "rey"){    
-                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0)break;
+                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0 || tablero[m][Px].color == color)break;
                 if((tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama") && tablero[m][Px].color == anti)return "jaque";
               }
               if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;            
@@ -252,7 +252,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           while(m > y){
               m--;
               if(tablero[Py][Px].tipo == "rey"){    
-                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0)break;
+                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0 || tablero[m][Px].color == color)break;
                 if((tablero[m][Px].tipo == "torre" || tablero[m][Px].tipo == "dama") && tablero[m][Px].color == anti)return "jaque";
               }
               if(tablero[m][Px].color == color || (tablero[m][Px] != 0 && m != y))allowPlay = false;
@@ -264,7 +264,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           while(m > x){
               m--;
               if(tablero[Py][Px].tipo == "rey"){    
-                if(tablero[Py][m].tipo != "torre" && tablero[Py][m].tipo != "dama" && tablero[Py][m] != 0)break;
+                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0 || tablero[m][Px].color == color)break;
                 if((tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama") && tablero[Py][m].color == anti)return "jaque";
               }
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
@@ -276,7 +276,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           while(m < x){
               m++;
               if(tablero[Py][Px].tipo == "rey"){    
-                if(tablero[Py][m].tipo != "torre" && tablero[Py][m].tipo != "dama" && tablero[Py][m] != 0)break;
+                if(tablero[m][Px].tipo != "torre" && tablero[m][Px].tipo != "dama" && tablero[m][Px] != 0 || tablero[m][Px].color == color)break;
                 if((tablero[Py][m].tipo == "torre" || tablero[Py][m].tipo == "dama") && tablero[Py][m].color == anti)return "jaque";
               }
               if(tablero[Py][m].color == color || (tablero[Py][m] != 0 && m != x))allowPlay = false;
