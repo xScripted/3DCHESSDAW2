@@ -56,6 +56,22 @@ socket.on('el', (Py) => {
     piecesOBJ[Py][4] = piecesOBJ[Py][7];
 });
 
+socket.on('coronaNegra', (mv) => {
+    var loader = new THREE.ObjectLoader();
+    piecesOBJ[1][mv.x1].name = mv.x1;    
+    loader.load("models/set2/queen.json",  (obj) => {
+        scene.getObjectByName(mv.x1).geometry = obj.geometry;
+        scene.getObjectByName(mv.x1).position.y = 1.3;
+    });
+})
+socket.on('coronaBlanca', (mv) => {
+    var loader = new THREE.ObjectLoader();
+    piecesOBJ[6][mv.x1].name = mv.x1;    
+    loader.load("models/set2/queen.json",  (obj) => {
+        scene.getObjectByName(mv.x1).geometry = obj.geometry;
+        scene.getObjectByName(mv.x1).position.y = 1.3;
+    }); 
+})
 socket.on('newGame', (ids) => {
     reloadPieces();
     room = ids[0]; //Guardem en quina room esta       
@@ -210,7 +226,7 @@ function bornPiece(obj,z,x,color,raza = "default") {
     obj.material.color = color;
     if(color.r == 0.2)obj.rotation.y = 85;
     obj.position.z = z;
-    obj.position.x = x;
+    obj.position.x = x;    
     obj["tipo"] = "piece";
     obj["raza"] = raza;
     obj["nameColor"] = color.r == 1 ? "white" : "black"; // Pasem rbg a nom normal per fer la distincio;

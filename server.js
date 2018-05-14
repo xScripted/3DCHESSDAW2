@@ -85,6 +85,14 @@ function checkMove(socket, mv) {
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       obj.board[mv.y2][mv.x2].used = true;
+      if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 1 && mv.y2 == 0){
+        io.to(mv.room).emit('coronaNegra', mv);
+        obj.board[mv.y2][mv.x2].tipo = "dama";
+      }
+      if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 0 && mv.y2 == 7){
+        io.to(mv.room).emit('coronaBlanca', mv);
+        obj.board[mv.y2][mv.x2].tipo = "dama";
+      }
       for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
       io.to(mv.room).emit('testReturned', returned);
     }

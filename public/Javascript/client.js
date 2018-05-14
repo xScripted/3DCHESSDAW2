@@ -23,7 +23,7 @@ function client() {
         });  
     })
 
-    socket.on('helper', (obj) => console.table(obj.board));
+    //socket.on('helper', (obj) => console.table(obj.board));
     //socket.on('tictoc', (times) => { //No funciona bien el orden
     //    timer1.innerHTML = toTimeSystem(times.t1);
     //    timer2.innerHTML = toTimeSystem(times.t2);
