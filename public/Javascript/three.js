@@ -51,6 +51,10 @@ socket.on('ec', (Py) => {
     enroqueC = Py;
     piecesOBJ[Py][2] = piecesOBJ[Py][0];
 });
+socket.on('el', (Py) => {
+    enroqueL = Py;
+    piecesOBJ[Py][4] = piecesOBJ[Py][7];
+});
 
 socket.on('newGame', (ids) => {
     reloadPieces();
@@ -228,7 +232,7 @@ function animate(){
         }else if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && piecesOBJ[mv.y1][mv.x1].position.y > 1) {
             piecesOBJ[mv.y1][mv.x1].position.y -= 0.5; // Baixada
         }
-        //Enroque
+        //Enroque Corto
         if(enroqueC == 0){
             piecesOBJ[0][2].position.x = Math.round((piecesOBJ[0][2].position.x + 0.1) * 10) / 10;
             if(piecesOBJ[0][2].position.x == 2)enroqueC = 10;
@@ -236,6 +240,17 @@ function animate(){
         if(enroqueC == 7){
             piecesOBJ[7][2].position.x = Math.round((piecesOBJ[7][2].position.x + 0.1) * 10) / 10;
             if(piecesOBJ[7][2].position.x == 2)enroqueC = 10;
+        }
+
+        //Enroque Largo
+        if(enroqueL == 0){
+            piecesOBJ[0][4].position.x = Math.round((piecesOBJ[0][4].position.x - 0.15) * 100) / 100;
+            if(piecesOBJ[0][4].position.x == 4)enroqueL = 10;
+        }
+
+        if(enroqueL == 7){
+            piecesOBJ[7][4].position.x = Math.round((piecesOBJ[7][4].position.x - 0.15) * 100) / 100;
+            if(piecesOBJ[7][4].position.x == 4)enroqueL = 10;
         }
 
         //Animacion finaltzada
@@ -278,7 +293,7 @@ function renderCasting() {
             old = intersects[0].object;        
             old.material.emissive.setHex(0xff0000);
         }
-        if(intersects[0].object.tipo == "board"){
+        if(intersects[0].object.tipo == "board" && old.position.x != intersects[0].object.position.x || old.position.z != intersects[0].object.position.z){
             socket.emit('test', {
                 x1: old.position.x, 
                 y1: old.position.z, 

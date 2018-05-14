@@ -23,9 +23,7 @@ function client() {
         });  
     })
 
-    socket.on('helper', (obj) => {
-        //console.table(obj.board);
-    })
+    socket.on('helper', (obj) => console.table(obj.board));
     //socket.on('tictoc', (times) => { //No funciona bien el orden
     //    timer1.innerHTML = toTimeSystem(times.t1);
     //    timer2.innerHTML = toTimeSystem(times.t2);
@@ -38,7 +36,7 @@ function client() {
     //MENUS
     var lista1 = document.querySelectorAll("#menu div");
     //Modos
-    lista1[0].addEventListener("click", () => {
+    lista1[0].addEventListener("click", () => {        
         chess.style.display = 'block';
         multiplayer.style.display = 'none';
     })

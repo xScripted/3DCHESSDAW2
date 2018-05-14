@@ -38,12 +38,18 @@ function checkMove(socket, mv) {
     if(obj.board[mv.y1][mv.x1].tipo == "dama")    returned.move = testDamas   (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST DAMAS B&N
     if(obj.board[mv.y1][mv.x1].tipo == "caballo") returned.move = testCaballos(obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
     if(obj.board[mv.y1][mv.x1].tipo == "rey")     returned.move = testReyes   (obj.board, returned.move, mv.y1, mv.x1, mv.y2, mv.x2, obj.board[mv.y1][mv.x1].color); //TEST REYES B&N    
-    //Enroque
-    if(obj.board[mv.y1][0].tipo == "torre" && !(obj.board[mv.y1][0].used) && obj.board[mv.y1][mv.x1].tipo == "rey" && 
-       obj.board[mv.y1][1] == 0 && obj.board[mv.y1][2] == 0 && mv.x2 == 1 && (mv.y2 == 0 || mv.y2 == 7)){
+    //Enroques
+    if(obj.board[mv.y1][0].tipo == "torre" && !(obj.board[mv.y1][0].used) && testJaque(obj.board) == 2 && !(obj.board[mv.y1][3].used) && obj.board[mv.y1][mv.x1].tipo == "rey" && 
+       obj.board[mv.y1][0].color == obj.board[mv.y1][3].color && obj.board[mv.y1][1] == 0 && obj.board[mv.y1][2] == 0 && mv.x2 == 1 && (mv.y2 == 0 || mv.y2 == 7)){
       if(mv.y1 == 0)obj.board = enroqueCorto(obj.board, 0, mv.room);
       if(mv.y1 == 7)obj.board = enroqueCorto(obj.board, 7, mv.room);
       returned.move = true;
+    }
+    if(obj.board[mv.y1][7].tipo == "torre" && !(obj.board[mv.y1][7].used) && testJaque(obj.board) == 2 && !(obj.board[mv.y1][3].used) && obj.board[mv.y1][mv.x1].tipo == "rey" && obj.board[mv.y1][7].color == obj.board[mv.y1][3].color
+       && obj.board[mv.y1][6] == 0 && obj.board[mv.y1][5] == 0 && obj.board[mv.y1][4] == 0 && mv.x2 == 5 && (mv.y2 == 0 || mv.y2 == 7)){         
+        if(mv.y1 == 0)obj.board = enroqueLargo(obj.board, 0, mv.room);
+        if(mv.y1 == 7)obj.board = enroqueLargo(obj.board, 7, mv.room);
+        if(testJaque(obj.board) == 2)returned.move = true;
     }
   }
 
@@ -56,7 +62,7 @@ function checkMove(socket, mv) {
 
   //Jaque 0 = blanca, 1 = negra, 2 = no
   //Si hay jaque
-  if(returned.move && obj.jaqueActivo != 2){
+  if(returned.move && obj.jaqueActivo != 2 && typeof(obj.board[mv.y2][mv.x2]) != "undefined"){
     //Hacemos la prediccion del proximo movimiento
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
@@ -93,6 +99,14 @@ function enroqueCorto(tablero, Py, room){
   tablero[Py][2] = tablero[Py][0];
   tablero[Py][0] = 0;
   io.to(room).emit('ec', Py);
+  return tablero;
+}
+
+function enroqueLargo(tablero, Py, room){
+  //tablero[Py][2].used = true;
+  tablero[Py][4] = tablero[Py][7];
+  tablero[Py][7] = 0;
+  io.to(room).emit('el', Py);
   return tablero;
 }
 
@@ -207,7 +221,7 @@ class Pieza {
   constructor(tipo, color){
       this.color = color;
       this.tipo = tipo; //Peon, torre, reina, etc...
-      this.used = false; // Solo para torres
+      this.used = false; // Solo para torres y reyes
   }
 }
 
@@ -283,7 +297,7 @@ function testTorres(tablero, allowPlay, Py, Px, y, x, color) {
           }
       }      
   }
-  if(allowPlay)tablero[Py][Px].used = true; //Cancelamos el enroque
+  if(allowPlay && tablero[Py][Px].tipo == "torre")tablero[Py][Px].used = true; //Cancelamos el enroque
   return allowPlay;
 }
 
