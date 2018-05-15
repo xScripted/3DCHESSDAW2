@@ -251,7 +251,7 @@ function testPeonNegro(tablero, Py, Px, y, x) {
 //TORRES
 function testTorres(tablero, Py, Px, y, x, color) { 
   let allowPlay = true;
-  let anti = color == 0 ? 1 : 0;
+let anti = 1 - color;
   if(Py != y && Px != x)allowPlay = false;//DIAGONAL OFF
   if(allowPlay){
       //PALANTE
@@ -308,72 +308,27 @@ function testTorres(tablero, Py, Px, y, x, color) {
 }
 
 //ALFILES
-function testAlfiles(tablero, Py, Px, y, x, color){
-  let allowPlay = true;
+function testAlfiles(tablero, Py, Px, y, x, color){ 
   let jaque = 2;
-  let Mx = x;
-  let My = y;
-  let anti = color == 0 ? 1 : 0;
-  if(y + Px == x + Py){ // Detectar diagonal
-      if(y > Py){ // Diagonal positiva dreta
-          while(Mx != Px){                
-              if(tablero[Py][Px].tipo == "rey"){  
-                if(tablero[My][Mx] != 0)jaque = 2; 
-                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
-              }
-              if(tablero[My][Mx].color == color)allowPlay = false;
-              if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
-              Mx--;
-              My--;
-          }
-          if(tablero[Py][Px].tipo == "rey")return jaque;
-      }
-      if(y < Py){ // Diagonal negativa esquerra
-          while(Mx != Px){
-              if(tablero[Py][Px].tipo == "rey"){       
-                if(tablero[My][Mx] != 0)jaque = 2; 
-                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
-              }
-              if(tablero[My][Mx].color && tablero[My][Mx].color == color)allowPlay = false;
-              if(tablero[My][Mx].color == anti && Mx > x)allowPlay = false; // No traspas
-              Mx++;
-              My++;
-          }
-          if(tablero[Py][Px].tipo == "rey")return jaque;        
-      }   
-  } else if (Math.abs(y - Px) == Math.abs(x - Py)) {
-      if(y > Py){ // Diagonal negativa dreta
-          while(Mx != Px){
-              if(tablero[Py][Px].tipo == "rey"){  
-                if(tablero[My][Mx] != 0)jaque = 2; 
-                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
-              }
-              console.log(y,Px,x,Py);
-              if(tablero[My][Mx].color == color)allowPlay = false;
-              if(tablero[My][Mx].color == anti && Mx > x)allowPlay = false; // No traspas
-              Mx++;
-              My--;
-          }
-          if(tablero[Py][Px].tipo == "rey")return jaque; 
-      }
-      if(y < Py){// Diagonal positiva esquerra
-          while(Mx != Px){
-              if(tablero[Py][Px].tipo == "rey"){        
-                if(tablero[My][Mx] != 0)jaque = 2; 
-                if((tablero[My][Mx].tipo == "alfil" || tablero[My][Mx].tipo == "dama") && tablero[My][Mx].color == anti)jaque = "jaque";                
-              }
-              if(tablero[My][Mx].color == color)allowPlay = false;
-              if(tablero[My][Mx].color == anti && Mx < x)allowPlay = false; // No traspas
-              Mx--;
-              My++;
-          }
-          if(tablero[Py][Px].tipo == "rey")return jaque; 
-      }   
-  } else {
-      allowPlay = false;
+  let [Mx, My] = [Px, Py];
+  let anti = 1 - color;
+
+  if(Px + y == Py + x){
+    let d = [];
+    if(My < y) while(My <= y) d.push(tablero[My++][Mx++]);
+    [Mx, My] = [Px, Py];
+    if(My > y) while(My >= y) d.push(tablero[My--][Mx--]);    
+    return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti);
+  }
+  if(Px + y == Py - x){ //Temporal
+    let d = [];
+    if(My < y) while(My <= y) d.push(tablero[My++][Mx++]);
+    [Mx, My] = [Px, Py];
+    if(My > y) while(My >= y) d.push(tablero[My--][Mx--]);    
+    return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti);
   }
 
-  return allowPlay;
+  return false;
 }
 
 //DAMAS
@@ -395,7 +350,7 @@ function testCaballos(tablero, Py, Px, y, x, color) {
   y = y > 7 ? 7 : y;
   x = x < 0 ? 0 : x;
   x = x > 7 ? 7 : x;
-  let anti = color == 0 ? 1 : 0;
+  let anti = 1 - color;
   if(tablero[Py][Px].tipo == "rey")if(typeof(tablero[y][x] != "undefined") && tablero[y][x] != 0)if(tablero[y][x].tipo == "caballo" && tablero[y][x].color == anti)return "jaque";
   if((Py + 2 == y || Py - 2 == y ) && (Px + 1 == x || Px - 1 == x))allowPlay = true;
   if((Px + 2 == x || Px - 2 == x ) && (Py + 1 == y || Py - 1 == y))allowPlay = true;
@@ -406,7 +361,7 @@ function testCaballos(tablero, Py, Px, y, x, color) {
 //REY
 function testReyes(tablero, Py, Px, y, x, color){
   let allowPlay = true;
-  let anti = color == 0 ? 1 : 0;
+  let anti = 1 - color;
   allowPlay = false;
   if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
   //Para que los reyes no se toquen entre si
@@ -490,7 +445,7 @@ function testMate(tablero, color) {
         for(let my = 0; my < 8; my++){
           for(let mx = 0; mx < 8; mx++){
             console.log("COORDS:",y, x, my, mx);
-            console.log(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx}));
+            //console.log(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx}));
           }
         }
       }
