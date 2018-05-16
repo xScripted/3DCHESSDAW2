@@ -26,7 +26,7 @@ function checkMove(socket, mv) {
     mv: mv,
     kill: false
   }
-  for(let x of listaPartidas)if(x.name == mv.room)obj = x;
+  for(let x of listaPartidas)if(x.name == mv.room)obj = x; //Optimizable
   returned.move = testMove(obj.board, mv);
   //Enroques
   if(obj != 0){ //Prescindible creo
@@ -56,20 +56,17 @@ function checkMove(socket, mv) {
 
   //Si hay jaque
   if(returned.move && obj.jaqueActivo != 2){
-    //Hacemos la prediccion del proximo movimiento
-    obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
-    obj.board[mv.y1][mv.x1] = 0;
-    obj.jaqueActivo = testJaque(obj.board); //Comprobamos si es jaque
-    //Lo dejamos como estaba
-    obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
-    obj.board[mv.y2][mv.x2] = 0;
+    //Hacemos la prediccion del proximo movimiento    
+    var tmp = Array.from(obj.board);
+    tmp[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
+    obj.jaqueActivo = testJaque(tmp, obj.jaqueActivo); //Comprobamos si es jaque
   }
   //Si no hay jaque
   if(returned.move && obj.jaqueActivo == 2){
     if(obj.board[mv.y2][mv.x2] != 0)returned.kill = true;
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
-    obj.jaqueActivo = testJaque(obj.board);    
+    obj.jaqueActivo = testJaque(obj.board, obj.jaqueActivo);    
     if(obj.jaqueActivo == obj.board[mv.y2][mv.x2].color){
       //Lo dejamos como estaba
       obj.jaqueActivo = 2;
@@ -78,7 +75,7 @@ function checkMove(socket, mv) {
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       console.log("Jaque: " + obj.jaqueActivo);
-      //if(obj.jaqueActivo != 2)if(testMate(obj.board, obj.jaqueActivo))console.log("JAQUE MATE !!!!!!!!!!!!");        
+      if(obj.jaqueActivo != 2)if(testMate(obj.board, obj.jaqueActivo))console.log("JAQUE MATE !!!!!!!!!!!!");        
 
       //Coronaciones 
       if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 1 && mv.y2 == 0){
@@ -336,9 +333,10 @@ function testCaballos(tablero, Py, Px, y, x, color) {
 }
 
 //REY
-function testReyes(tablero, Py, Px, y, x, color){
+function testReyes(tablero, Py, Px, y, x, color, test = false){
   let allowPlay = false;
   let anti = 1 - color;
+  if(y > 7 || y < 0 || x > 7 || x < 0)return false;
   if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
   //Para que los reyes no se toquen entre si
   for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(ty >= 0 && ty <= 7)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
@@ -346,13 +344,14 @@ function testReyes(tablero, Py, Px, y, x, color){
 } 
 
 //JAQUE
-function testJaque(tablero) {
+function testJaque(tablero, jaque) {
   let dy = 0, dx = 0;
   //Localizamos reyes
   for(let y in tablero){
     for(let x in tablero){
       if(tablero[y][x] != 0){
         if(tablero[y][x].tipo == "rey"){
+          let anti = 1 - tablero[y][x].color;
           x = parseInt(x); // No deberia ser strings
           y = parseInt(y);
           //Test rectas
@@ -395,11 +394,14 @@ function testJaque(tablero) {
           if(tablero[y][x].color == 0){
             if(y < 7 && x < 7)if(tablero[y+1][x+1].tipo == "peon" && tablero[y+1][x+1].color == 1)return 0;
             if(y < 7 && x > 0)if(tablero[y+1][x-1].tipo == "peon" && tablero[y+1][x-1].color == 1)return 0;                                          
-          }
+          }       
+          //if(y < 7 && x > 0)console.log(y++,x--, tablero[y++][x--]);
+          if(y < 7 && x > 0 && tablero[y++][x--].color == anti && tablero[y++][x--].tipo == "dama")return jaque;
         }
       }
     }
   }
+  console.log("Te devuelvo un 2 chaval"); 
   return 2;
 }
 
@@ -421,12 +423,12 @@ function testMate(tablero, color) {
       if(tablero[y][x] != 0 && tablero[y][x].color == color){
         for(let my = 0; my < 8; my++){
           for(let mx = 0; mx < 8; mx++){
-            if(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx})){
-              tablero[my][mx] = tablero[y][x];
+            if(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx}) && my != y || mx != x){
+              /*tablero[my][mx] = tablero[y][x];
               tablero[y][x] = 0;
-              console.log(my, mx, y, x, "Jaque:",testJaque(tablero), tablero[my][mx]);
+              console.log(y, x, my, mx, "Jaque:",testJaque(tablero), tablero[my][mx]);
               tablero[y][x] = tablero[my][mx];
-              tablero[my][mx] = 0; 
+              tablero[my][mx] = 0; */
             }
           }
         }
