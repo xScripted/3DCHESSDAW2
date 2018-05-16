@@ -72,6 +72,7 @@ function checkMove(socket, mv) {
     autojaque = obj.jaqueActivo == obj.board[mv.y2][mv.x2].color ? true : false;
     if(autojaque){
       //Lo dejamos como estaba
+      obj.jaqueActivo = 2;
       obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
       obj.board[mv.y2][mv.x2] = 0;
     } else {      
@@ -251,7 +252,7 @@ function testPeonNegro(tablero, Py, Px, y, x) {
 //TORRES
 function testTorres(tablero, Py, Px, y, x, color) { 
   let allowPlay = true;
-let anti = 1 - color;
+  let anti = 1 - color;
   if(Py != y && Px != x)allowPlay = false;//DIAGONAL OFF
   if(allowPlay){
       //PALANTE
@@ -309,7 +310,6 @@ let anti = 1 - color;
 
 //ALFILES
 function testAlfiles(tablero, Py, Px, y, x, color){ 
-  let jaque = 2;
   let [Mx, My] = [Px, Py];
   let anti = 1 - color;
 
@@ -318,16 +318,29 @@ function testAlfiles(tablero, Py, Px, y, x, color){
     if(My < y) while(My <= y) d.push(tablero[My++][Mx++]);
     [Mx, My] = [Px, Py];
     if(My > y) while(My >= y) d.push(tablero[My--][Mx--]);    
+    if(tablero[Py][Px].tipo == "rey" && tablero[Py][Px].color == color){
+      for(let e of d) {                
+        if((e.tipo == "alfil" || e.tipo == "dama") && e.color == anti)return "jaque";     
+        if(e != 0 && e.tipo != "rey")return 2;
+      }
+      return 2;
+    }
     return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti);
   }
-  if(Px + y == Py - x){ //Temporal
+  if(Px + Py == x + y){ 
     let d = [];
-    if(My < y) while(My <= y) d.push(tablero[My++][Mx++]);
+    if(My < y) while(My <= y) d.push(tablero[My++][Mx--]);
     [Mx, My] = [Px, Py];
-    if(My > y) while(My >= y) d.push(tablero[My--][Mx--]);    
+    if(My > y) while(My >= y) d.push(tablero[My--][Mx++]); 
+    if(tablero[Py][Px].tipo == "rey" && tablero[Py][Px].color == color){
+      for(let e of d) {                
+        if((e.tipo == "alfil" || e.tipo == "dama") && e.color == anti)return "jaque";     
+        if(e != 0 && e.tipo != "rey")return 2;
+      }
+      return 2;
+    }   
     return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti);
   }
-
   return false;
 }
 
@@ -360,9 +373,8 @@ function testCaballos(tablero, Py, Px, y, x, color) {
 
 //REY
 function testReyes(tablero, Py, Px, y, x, color){
-  let allowPlay = true;
+  let allowPlay = false;
   let anti = 1 - color;
-  allowPlay = false;
   if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
   //Para que los reyes no se toquen entre si
   for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(ty >= 0 && ty <= 7)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
@@ -444,7 +456,7 @@ function testMate(tablero, color) {
       if(tablero[y][x] != 0 && tablero[y][x].color == color){
         for(let my = 0; my < 8; my++){
           for(let mx = 0; mx < 8; mx++){
-            console.log("COORDS:",y, x, my, mx);
+            //console.log("COORDS:",y, x, my, mx);
             //console.log(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx}));
           }
         }
