@@ -57,8 +57,9 @@ function checkMove(socket, mv) {
   //Si hay jaque
   if(returned.move && obj.jaqueActivo != 2){
     //Hacemos la prediccion del proximo movimiento    
-    var tmp = Array.from(obj.board);
-    tmp[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
+    let tmp = clone(obj.board);
+    tmp[mv.y2][mv.x2] = tmp[mv.y1][mv.x1];
+    tmp[mv.y1][mv.x1] = 0;  
     obj.jaqueActivo = testJaque(tmp, obj.jaqueActivo); //Comprobamos si es jaque
   }
   //Si no hay jaque
@@ -75,7 +76,7 @@ function checkMove(socket, mv) {
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       console.log("Jaque: " + obj.jaqueActivo);
-      if(obj.jaqueActivo != 2)if(testMate(obj.board, obj.jaqueActivo))console.log("JAQUE MATE !!!!!!!!!!!!");        
+      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo))console.log("JAQUE MATE !!!!!!!!!!!!");        
 
       //Coronaciones 
       if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 1 && mv.y2 == 0){
@@ -394,14 +395,11 @@ function testJaque(tablero, jaque) {
           if(tablero[y][x].color == 0){
             if(y < 7 && x < 7)if(tablero[y+1][x+1].tipo == "peon" && tablero[y+1][x+1].color == 1)return 0;
             if(y < 7 && x > 0)if(tablero[y+1][x-1].tipo == "peon" && tablero[y+1][x-1].color == 1)return 0;                                          
-          }       
-          //if(y < 7 && x > 0)console.log(y++,x--, tablero[y++][x--]);
-          if(y < 7 && x > 0 && tablero[y++][x--].color == anti && tablero[y++][x--].tipo == "dama")return jaque;
+          }              
         }
       }
     }
   }
-  console.log("Te devuelvo un 2 chaval"); 
   return 2;
 }
 
@@ -417,22 +415,33 @@ function testMove(board, mv) {
 
 //JAQUE MATE
 function testMate(tablero, color) {
-  let mate = true;
   for(let y = 0; y < 8; y++){
     for(let x = 0; x < 8; x++){
       if(tablero[y][x] != 0 && tablero[y][x].color == color){
         for(let my = 0; my < 8; my++){
           for(let mx = 0; mx < 8; mx++){
-            if(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx}) && my != y || mx != x){
-              /*tablero[my][mx] = tablero[y][x];
-              tablero[y][x] = 0;
-              console.log(y, x, my, mx, "Jaque:",testJaque(tablero), tablero[my][mx]);
-              tablero[y][x] = tablero[my][mx];
-              tablero[my][mx] = 0; */
+            if(testMove(tablero,{y1: y, x1: x, y2: my, x2: mx})){
+              let tmp = clone(tablero);
+              tmp[my][mx] = tmp[y][x];
+              tmp[y][x] = 0;
+              if(testJaque(tmp) == 2)return false;
             }
           }
         }
       }
     }
   }
+  return true;
+}
+
+function clone(obj){
+  let nuevo = initArray(8,8);
+  for(let y = 0; y < 8; y++)for(let x = 0; x < 8; x++)nuevo[y][x] = obj[y][x];
+  return nuevo;
+}
+//INIT ARRAY FUNCTION
+function initArray(y,x){
+  let tmp = new Array(y).fill(0);
+  for(let j in tmp)tmp[j] = new Array(x).fill(0);
+  return tmp;
 }
