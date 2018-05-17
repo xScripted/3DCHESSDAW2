@@ -15,8 +15,8 @@
     var socket = io();
     window.onload = () => {
         var inputs = document.querySelectorAll("input");
-        inputs[0].addEventListener("click", () => socket.emit('crearSala'));
-        inputs[1].addEventListener("click", () => socket.emit('borrarSala'));
+        inputs[0].addEventListener("click", () => socket.emit('crearSala', inputs[1].value));
+        inputs[2].addEventListener("click", () => socket.emit('borrarSala'));
         socket.on('ok', (listaPartidas) => {
             let taulaHTML = "<tr><td>ID</td><td>Jugadores</td><td>Espectadores</td><td colspan='2'>Unir-se</td></tr>";
             for(let j of listaPartidas)taulaHTML += `<tr><tr><td>${j.name.slice(0,3)}</td><td>${j.players}/2</td><td>${j.spect}</td><td><input class="unirse" type="button" data='${j.name}' value="Unir-se"></td></tr>`;
@@ -28,7 +28,8 @@
 </script>
 <body>
     <input type="button" name="Crear" value="Crear Sala">
-    <input type="button" name="Salir" value="Salir">
+    <input type="text" name="temps" value="10" placeholder="temps en minuts">
+    <input type="button" name="Salir" value="Sortir">
     <table id="taula" border>
     </table>
 </body>

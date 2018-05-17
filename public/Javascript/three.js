@@ -72,17 +72,15 @@ socket.on('coronaBlanca', (mv) => {
         scene.getObjectByName(mv.x1).position.y = 1.3;
     }); 
 })
-socket.on('newGame', (ids) => {
+socket.on('newGame', (info) => {
     reloadPieces();
-    room = ids[0]; //Guardem en quina room esta       
+    room = info.ids[0]; //Guardem en quina room esta       
     chess.style.display = 'block'; 
     multiplayer.style.display = 'none';
-    if(j1){
-        loadNames(ids);
-    } else {
-        loadNames(ids);
-    }
+    loadTexts(info);
 })
+
+socket.on('tictoc', (info) => loadTimers(info));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function init() {
@@ -330,12 +328,13 @@ function reloadPieces() {
 
 }
 
-function loadNames(ids) {
+function loadTexts(info) {
+    console.log("INFO:", info);
     var loader = new THREE.FontLoader();
     var material = new THREE.MeshBasicMaterial({color: "black"});
 
     loader.load( 'helvetiker_regular.typeface.json', (font) => {
-        var geometry = new THREE.TextGeometry( `User${ids[0].slice(0,3)}`, {
+        var geometry = new THREE.TextGeometry( `User${info.ids[0].slice(0,3)}`, {
             font: font,
             size: 1,
             height: 0.1,
@@ -345,7 +344,7 @@ function loadNames(ids) {
         texto1.position.set(0, -0.5, 10);
         texto1.rotateX(-90 * Math.PI / 180);
 
-        var geometry2 = new THREE.TextGeometry( `User${ids[1].slice(0,3)}`, {
+        var geometry2 = new THREE.TextGeometry( `User${info.ids[1].slice(0,3)}`, {
             font: font,
             size: 1,
             height: 0.1,
@@ -359,4 +358,58 @@ function loadNames(ids) {
         scene.add(texto1);
         scene.add(texto2);
     });
+
+    loader.load( 'helvetiker_regular.typeface.json', (font) => {
+        var geometry = new THREE.TextGeometry(toTimeSystem(info.time1), {
+            font: font,
+            size: 0.7,
+            height: 0.02,
+            curveSegments: 20,
+        });    
+        var timer1 = new THREE.Mesh(geometry, material);
+        timer1.name = "timer1";
+        timer1.position.set(-2, 0.5, 3);
+        timer1.rotateX(-90 * Math.PI / 180);
+        timer1.rotateY(30 * Math.PI / 180);
+        timer1.rotateZ(90 * Math.PI / 180);
+
+        var geometry2 = new THREE.TextGeometry(toTimeSystem(info.time2), {
+            font: font,
+            size: 0.7,
+            height: 0.02,
+            curveSegments: 20,
+        });
+        var timer2 = new THREE.Mesh(geometry2, material);
+        timer2.name = "timer2";
+        timer2.position.set(-2, 0.5, 7);
+        timer2.rotateX(-90 * Math.PI / 180);
+        timer2.rotateY(30 * Math.PI / 180);
+        timer2.rotateZ(90 * Math.PI / 180);
+        console.log(timer1);
+        scene.add(timer1);
+        scene.add(timer2);
+    });
+
+}
+
+function loadTimers(info){    
+    var loader = new THREE.FontLoader();
+    console.log("entra!", info);
+    loader.load( 'helvetiker_regular.typeface.json', (font) => {
+        var geometry = new THREE.TextGeometry(toTimeSystem(info.time1), {
+            font: font,
+            size: 0.7,
+            height: 0.02,
+            curveSegments: 20,
+        });    
+
+        var geometry2 = new THREE.TextGeometry(toTimeSystem(info.time2), {
+            font: font,
+            size: 0.7,
+            height: 0.02,
+            curveSegments: 20,
+        });    
+        scene.getObjectByName("timer1").geometry = geometry;
+        scene.getObjectByName("timer2").geometry = geometry2;
+    })
 }

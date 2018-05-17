@@ -28,6 +28,7 @@ function checkMove(socket, mv) {
   }
   for(let x of listaPartidas)if(x.name == mv.room)obj = x; //Optimizable
   returned.move = testMove(obj.board, mv);
+  if(socket.id != obj.ids[obj.turn] || obj.board[mv.y1][mv.x1].color != obj.turn)returned.move = false;
   //Enroques
   if(obj != 0){ //Prescindible creo
     if(obj.board[mv.y1][0].tipo == "torre" && !(obj.board[mv.y1][0].used) && testJaque(obj.board) == 2 && !(obj.board[mv.y1][3].
@@ -43,14 +44,7 @@ function checkMove(socket, mv) {
       if(mv.y1 == 7)obj.board = enroqueLargo(obj.board, 7, mv.room);
       if(testJaque(obj.board) == 2)returned.move = true;
     }
-  }
-
-  /*Comprobar torn
-  if(socket.id == obj.ids[obj.turn] && obj.board[mv.y1][mv.x1].color == obj.turn){ //Comprobar Torn && Color            
-     obj.turn = obj.turn == 0 ? 1 : 0; //Toggle                
-  } else {
-      returned.move = false;
-  }*/    
+  }  
 
   //Jaque 0 = blanca, 1 = negra, 2 = no
 
@@ -68,14 +62,14 @@ function checkMove(socket, mv) {
     obj.board[mv.y2][mv.x2] = obj.board[mv.y1][mv.x1];
     obj.board[mv.y1][mv.x1] = 0;
     obj.jaqueActivo = testJaque(obj.board, obj.jaqueActivo);    
-    if(obj.jaqueActivo == obj.board[mv.y2][mv.x2].color){
+    if(obj.jaqueActivo == obj.board[mv.y2][mv.x2].color){ //Si sigue habiendo jaque
       //Lo dejamos como estaba
       obj.jaqueActivo = 2;
       obj.board[mv.y1][mv.x1] = obj.board[mv.y2][mv.x2];
       obj.board[mv.y2][mv.x2] = 0;
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
-      console.log("Jaque: " + obj.jaqueActivo);
+      //console.log("Jaque: " + obj.jaqueActivo); MIRAR QUIN JAQUE ESTA ACTIU
       if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo))console.log("JAQUE MATE !!!!!!!!!!!!");        
 
       //Coronaciones 
@@ -87,7 +81,8 @@ function checkMove(socket, mv) {
         io.to(mv.room).emit('coronaBlanca', mv);
         obj.board[mv.y2][mv.x2].tipo = "dama";
       }
-      obj.board[mv.y2][mv.x2].used = true;
+      obj.board[mv.y2][mv.x2].used = true;         
+      obj.turn = 1 - obj.turn; //Toggle                
       for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
       io.to(mv.room).emit('testReturned', returned);
     }
@@ -124,14 +119,14 @@ function crearSala(socket){
     // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas.push({
       name: socket.id, 
-      estat: "Esperando...", 
+      estat: "Esperant...", 
       ids: new Array(), 
       players: 1, 
       board: initBoard(), 
       jaqueActivo: 2, 
       time1: 600, 
       time2: 600, 
-      turn: Math.floor(Math.random()*2)
+      turn: 0
     }); 
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
     actualitzarTaula();
@@ -149,12 +144,12 @@ function joinSala(socket, data) {
       // NEW GAME
       if(j.players == 2){       
         j.estat = 'In Game';
-        io.to(j.name).emit('newGame', j.ids); 
+        io.to(j.name).emit('newGame', j); 
 
         setInterval(() => {
           if(j.turn == 0)j.time1 -= 1;
           if(j.turn == 1)j.time2 -= 1;
-          io.to(j.name).emit('tictoc', {t1: j.time1, t2: j.time2}); 
+          io.to(j.name).emit('tictoc', j); 
         }, 1000)     
       }
       
