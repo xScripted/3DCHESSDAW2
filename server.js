@@ -82,7 +82,7 @@ function checkMove(socket, mv) {
         obj.board[mv.y2][mv.x2].tipo = "dama";
       }
       obj.board[mv.y2][mv.x2].used = true;         
-      obj.turn = 1 - obj.turn; //Toggle                
+      obj.turn = 1 - obj.turn; //Toggle turn            
       for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
       io.to(mv.room).emit('testReturned', returned);
     }

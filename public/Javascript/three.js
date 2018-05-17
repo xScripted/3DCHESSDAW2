@@ -96,35 +96,19 @@ function init() {
 
 
     //PRUEBAS BACKGROUND
-    // instantiate a loader
-    var bgimg = new THREE.ImageLoader();
-
-    /* load a image resource
-    bgimg.load(
-        // resource URL
-        'img/bg1.jpg',
-
-        // onLoad callback
-        function ( image ) {
-            // use the image, e.g. draw part of it on a canvas
-            var canvas = document.createElement( 'canvas' );
-            var context = canvas.getContext( '2d' );
-            context.drawImage( image, 100, 100 );
-        },
-
-        // onProgress callback currently not supported
-        undefined,
-
-        // onError callback
-        function () {
-            console.error( 'An error happened.' );
-        }
-    );
+    scene.background = new THREE.CubeTextureLoader().setPath('../img/maps/')
+	.load([
+        'px.png',
+        'nx.png',
+        'py.png',
+        'ny.png',
+        'pz.png',
+        'nz.png'
+	]);
 
     ///////////////////////////*/
 
     //Llums !
-    scene.background = new THREE.Color(bgimg); //BackgroundColor
     var light = new THREE.AmbientLight("white"); // soft white light
     var spotLight = new THREE.SpotLight(0xffffff);
     spotLight.position.set( 15, 20, 35 );
@@ -381,7 +365,7 @@ function loadTexts(info) {
         });
         var timer2 = new THREE.Mesh(geometry2, material);
         timer2.name = "timer2";
-        timer2.position.set(-2, 0.5, 7);
+        timer2.position.set(-2, 0.5, 6);
         timer2.rotateX(-90 * Math.PI / 180);
         timer2.rotateY(30 * Math.PI / 180);
         timer2.rotateZ(90 * Math.PI / 180);
@@ -394,7 +378,6 @@ function loadTexts(info) {
 
 function loadTimers(info){    
     var loader = new THREE.FontLoader();
-    console.log("entra!", info);
     loader.load( 'helvetiker_regular.typeface.json', (font) => {
         var geometry = new THREE.TextGeometry(toTimeSystem(info.time1), {
             font: font,
