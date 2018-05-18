@@ -316,15 +316,13 @@ function testDamas(tablero, Py, Px, y, x, color){
 //CABALLOS
 function testCaballos(tablero, Py, Px, y, x, color) {
   let allowPlay = false;
-  y = y < 0 ? 0 : y;
-  y = y > 7 ? 7 : y;
-  x = x < 0 ? 0 : x;
-  x = x > 7 ? 7 : x;
   let anti = 1 - color;
-  if((Py + 2 == y || Py - 2 == y ) && (Px + 1 == x || Px - 1 == x))allowPlay = true;
-  if((Px + 2 == x || Px - 2 == x ) && (Py + 1 == y || Py - 1 == y))allowPlay = true;
-  if(tablero[y][x].color == color)allowPlay = false;    
-  if(allowPlay && tablero[y][x] != 0 && tablero[Py][Px].tipo == "rey" && tablero[y][x].tipo == "caballo" && tablero[y][x].color == anti)return "jaque";
+  if(y >= 0 && y <= 7 && x >= 0 && x <= 7) {
+    if((Py + 2 == y || Py - 2 == y ) && (Px + 1 == x || Px - 1 == x))allowPlay = true;
+    if((Px + 2 == x || Px - 2 == x ) && (Py + 1 == y || Py - 1 == y))allowPlay = true;
+    if(tablero[y][x].color == color)allowPlay = false;    
+    if(allowPlay && tablero[y][x] != 0 && tablero[Py][Px].tipo == "rey" && tablero[y][x].tipo == "caballo" && tablero[y][x].color == anti)return "jaque";
+  }
   return allowPlay;
 }
 
@@ -372,16 +370,11 @@ function testJaque(tablero, jaque) {
           dy = dy > 7 ? 7 : dy;
           if(testAlfiles(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
           if(testAlfiles(tablero, y, x, dx, dy, tablero[y][x].color) == "jaque")return tablero[y][x].color;
+          
           //Test Caballos
-          //Falta por OPTIMIZAR
-          if(testCaballos(tablero, y, x, y + 2, x + 1, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y + 2, x - 1, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y + 1, x - 2, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y + 1, x + 2, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y - 1, x - 2, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y - 1, x + 2, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y - 2, x - 1, tablero[y][x].color) == "jaque")return tablero[y][x].color;
-          if(testCaballos(tablero, y, x, y - 2, x + 1, tablero[y][x].color) == "jaque")return tablero[y][x].color;
+          let c = [[2, -2],[1, -1]];
+          for(let n = -2; n <= 2; n++) if(n != 0) for(let k of c[Math.abs(n) - 1]) if(testCaballos(tablero, y, x, y + n, x + k, tablero[y][x].color) == "jaque")return tablero[y][x].color;;
+
           //Test Peones
           if(tablero[y][x].color == 1){
             if(y > 0 && x < 7)if(tablero[y-1][x+1].tipo == "peon" && tablero[y-1][x+1].color == 0)return 1;
