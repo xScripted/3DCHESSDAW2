@@ -1,65 +1,50 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="ca">
 <head>
-    <title> Chess Miquel Toran</title>
-    <meta charset="UTF-8">
-    <link rel="shortcut icon" href="img/peon.png" />
-    <link rel="stylesheet" href="css/css.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/client.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/three.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/OrbitControls.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/TextureLoader.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js"></script>
+    <meta charset="utf-8">
+    <title>Portada</title>
+    <script src="Javascript/TweenMax.min.js"></script>
+    <script>
+        window.onload = () => {
+            for(let k = 0; k < 400; k++)createParticle();
+        }
+        function createParticle() {
+            let p = document.createElement("div");
+            let img = Math.floor(Math.random() * 5);
+            let wix = Math.random() * portada.clientWidth;
+            let vel = Math.random() * 50 + 20;
+            let tam = (Math.random() * 50 + 40) + "px";
+            p.style.width  = tam;
+            p.style.height = tam;
+            p.style.position = "absolute";
+            p.style.background = `url(img/index/${img}.png)`;
+            p.style.backgroundSize = "100%";
+            p.style.opacity = 0.8;
+            p.style.marginTop = `${portada.clientHeight}px`;
+            p.style.marginLeft = `${wix}px`;    
+            portada.appendChild(p);
+            TweenMax.to(p, vel, {
+                marginTop:"-300px",
+                opacity: 0,
+                rotationX: Math.random() * 900 + 50,
+                //rotationY: Math.random() * 900 + 50,
+                rotationZ: Math.random() * 900 + 50,
+                delay: Math.random() * 100,
+                repeat: -1
+            })
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
 </head>
 <body>
-    <!-- MENU -->
-    <div id="menu">
-        <div><img src="img/jugar.png"><b>Jugar</b></div>
-        <div><img src="img/modo.png"><b>Modo</b></div>
-        <div><img src="img/ccolor.png"><b>Cambiar Colores</b></div>
-        <div><img src="img/multiplayer.png"><b>Multiplayer</b></div>
-    </div>
-    <div id="menu2">
-        <div id="colorAll" class="menu2">
-            <p>Color Principal</p>
-            <input type="color" id="inputColor">
-            <p>Color Tablero</p>
-            <input type="color" id="inputColor2">
+    <div id="portada">
+        <div id="login">
+            <input type="text" placeholder="nick">
+            <input type="password" placeholder="password">
+            <input type="button" value="Iniciar Sessió">
+            <input type="button" value="Registrar-se">
+            <input type="button" value="Jugar com invitat">
         </div>
-        <div id="modos" class="menu2">
-            <div>Normal</div>
-            <div>Spin</div>
-            <div>Random</div>
-        </div>
-    </div>
-     <!-- ////////// -->
-    <div id="chess">
-        <div id="board3D"></div>
-    </div>
-    <div id="multiplayer">
-        <div id="crearysalir">
-            <input type="button" name="Crear" value="Crear Sala">
-            <input type="button" name="Salir" value="Salir">
-        </div>
-        <div id="taula"></div>
     </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
