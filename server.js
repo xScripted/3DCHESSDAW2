@@ -70,7 +70,7 @@ function checkMove(socket, mv) {
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       //console.log("Jaque: " + obj.jaqueActivo); MIRAR QUIN JAQUE ESTA ACTIU
-      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo))console.log("JAQUE MATE !!!!!!!!!!!!");        
+      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo))io.to(mv.room).emit('mate', obj.turn); ;        
 
       //Coronaciones 
       if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 1 && mv.y2 == 0){
@@ -119,7 +119,7 @@ function crearSala(socket){
     // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas.push({
       name: socket.id, 
-      estat: "Esperant...", 
+      estat: "Esperando...", 
       ids: new Array(), 
       players: 1, 
       board: initBoard(), 
@@ -143,12 +143,14 @@ function joinSala(socket, data) {
 
       // NEW GAME
       if(j.players == 2){       
-        j.estat = 'In Game';
+        j.estat = 'En Partida';
         io.to(j.name).emit('newGame', j); 
 
-        setInterval(() => {
+        let temps = setInterval(() => {
           if(j.turn == 0)j.time1 -= 1;
           if(j.turn == 1)j.time2 -= 1;
+          if(j.time1 == 0 || j.time2 == 0)clearInterval(temps);
+
           io.to(j.name).emit('tictoc', j); 
         }, 1000)     
       }
@@ -349,10 +351,10 @@ function testJaque(tablero, jaque) {
           x = parseInt(x); // No deberia ser strings
           y = parseInt(y);
           //Test rectas
-          if(testTorres(tablero, y, x, 7, x, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
-          if(testTorres(tablero, y, x, 0, x, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
-          if(testTorres(tablero, y, x, y, 7, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
-          if(testTorres(tablero, y, x, y, 0, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
+          for(let xoy = 0; xoy <= 7; xoy += 7){
+            if(testTorres(tablero, y, x, xoy, x, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
+            if(testTorres(tablero, y, x, y, xoy, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
+          }       
           dy = y - x + 7;
           dx = x - y + 7;
           dy = dy > 7 ? 7 : dy;

@@ -23,7 +23,7 @@ function client() {
         });  
     })
 
-    socket.on('helper', (obj) => console.table(obj.board));
+    //socket.on('helper', (obj) => console.table(obj.board));
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(localStorage.getItem("bgcolor") != null)colorWeb(true); //LocalStorage
