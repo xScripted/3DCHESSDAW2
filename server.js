@@ -26,7 +26,8 @@ function checkMove(socket, mv) {
     mv: mv,
     kill: false
   }
-  for(let x of listaPartidas)if(x.name == mv.room)obj = x; //Optimizable
+  obj = listaPartidas.filter((e) => e.name == mv.room)[0];
+  if(typeof(obj) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.move = testMove(obj.board, mv);
   if(socket.id != obj.ids[obj.turn] || obj.board[mv.y1][mv.x1].color != obj.turn)returned.move = false;
   //Enroques

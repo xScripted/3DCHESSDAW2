@@ -6,7 +6,7 @@ body {
 
 #portada {
     display: grid;
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 1000px;
     background-image: url('../img/index/wp2.jpg');
@@ -16,11 +16,41 @@ body {
 
 #login {
     display: grid;
+    grid-gap: 10px;
     position: relative;
     margin: auto;
+    top: 150px;
     align-self: center;
     justify-self: center;
     width: 30%;
     min-width: 300px;
-    height: 300px;
+    height: 600px;
+    z-index: 10;
 }
+#login *{
+    font-size: 20px;
+    color: black;
+    font-family: 'Raleway', sans-serif;
+}
+#tagline {
+    width: 600px;
+}
+#login img {
+    margin-left: 12px;
+}
+input[type="button"] {
+    transition: 0.3s;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+input[type="button"]:hover {
+    transition: 0.3s;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+#logo {
+    position: absolute;
+    left: 245px;
+    top: -50px;
+    opacity: 0;
+}
+
+
