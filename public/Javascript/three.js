@@ -16,6 +16,7 @@ var mv; // Obj de los movimientos
 var wz = 2, bz = 5, wx = 9, bx = 9;
 var subid = 0;
 var enroqueC, enroqueL;
+var modo = "normal";
 // MAIN
 window.onload = () => {
     client();
@@ -53,6 +54,7 @@ socket.on('ec', (Py) => {
     enroqueC = Py;
     piecesOBJ[Py][2] = piecesOBJ[Py][0];
 });
+
 socket.on('el', (Py) => {
     enroqueL = Py;
     piecesOBJ[Py][4] = piecesOBJ[Py][7];
@@ -66,6 +68,7 @@ socket.on('coronaNegra', (mv) => {
         scene.getObjectByName(mv.x1).position.y = 1.3;
     });
 })
+
 socket.on('coronaBlanca', (mv) => {
     var loader = new THREE.ObjectLoader();
     piecesOBJ[6][mv.x1].name = mv.x1;    
@@ -74,7 +77,9 @@ socket.on('coronaBlanca', (mv) => {
         scene.getObjectByName(mv.x1).position.y = 1.3;
     }); 
 })
+
 socket.on('newGame', (info) => {
+    modo = info.modalidad;
     removePieces();
     //genPieces();
     room = info.ids[0]; //Guardem en quina room esta       
@@ -223,7 +228,7 @@ function bornPiece(obj,z,x,color,raza = "default") {
     scene.add(obj);
 }
 function animate(){
-    requestAnimationFrame(animate);  //Fa la funcio d'un setInterval     
+    requestAnimationFrame(animate);  //Fa la funcio d'un setInterval   
     if(typeof(mv) === "object"){
         if(piecesOBJ[mv.y1][mv.x1].position.z < mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z + 0.1) * 10) / 10;
         if(piecesOBJ[mv.y1][mv.x1].position.x < mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x + 0.1) * 10) / 10;
@@ -264,6 +269,17 @@ function animate(){
             piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];
             piecesOBJ[mv.y1][mv.x1] = 0;
             mv = 0;
+            if(modo == "Spin"){
+                for(let y in piecesOBJ){
+                    for(let x in piecesOBJ){
+                        if(piecesOBJ[y][x] != 0 && x < 7)piecesOBJ[y][x].position.x += 1;
+                        if(piecesOBJ[y][x] != 0 && x == 7)piecesOBJ[y][x].position.x = 0;
+                    }
+                    piecesOBJ[y].unshift(piecesOBJ[y][piecesOBJ[y].length - 1]);
+                    piecesOBJ[y].pop();
+                }
+                console.table(piecesOBJ);
+            }
         }
     }
     renderer.render(scene, camera); //Renderitza l'escena a 60 frames 
@@ -302,6 +318,7 @@ function newLight(x,y,z, lateral = false, color = 0xffffff, int = 0.4) {
     scene.add(spotLight);
     //scene.add(spotLightHelper);
 }
+
 function renderCasting() {
     raycaster.setFromCamera(mouse, camera); // update the picking ray with the camera and mouse position
     var intersects = raycaster.intersectObjects(scene.children);// calculate objects intersecting the picking ray

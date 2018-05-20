@@ -10,23 +10,25 @@ app.use(express.static(__dirname + '/public'));
 
 // Main <3
 io.on('connection', (socket) => {
-  actualitzarTaula();
-  socket.on('crearSala',  () => crearSala(socket));
+  socket.on('crearSala',(tm) => crearSala(socket, tm));
   socket.on('disconnect', () => borrarSala(socket));
   socket.on('borrarSala', () => borrarSala(socket));
   socket.on('joinSala', (id) => joinSala(socket,id));
   socket.on('test',     (mv) => checkMove(socket, mv));
 });
 
+setInterval(() => io.emit('ok', listaPartidas), 1000);
 function checkMove(socket, mv) {
   let obj = 0; 
   let autojaque;
   var returned = {
     move: true,
     mv: mv,
-    kill: false
+    kill: false,
+    mode: "normal"
   }
   obj = listaPartidas.filter((e) => e.name == mv.room)[0];
+  returned.mode = obj.modalidad;
   if(typeof(obj) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.move = testMove(obj.board, mv);
   if(socket.id != obj.ids[obj.turn] || obj.board[mv.y1][mv.x1].color != obj.turn)returned.move = false;
@@ -85,6 +87,12 @@ function checkMove(socket, mv) {
       obj.board[mv.y2][mv.x2].used = true;         
       obj.turn = 1 - obj.turn; //Toggle turn            
       for(let x of listaPartidas)if(x.name == mv.room)x.board = obj.board; // Retornamos el tablero posicionado
+      if(obj.modalidad == "Spin"){
+        for(let y in obj.board){
+          obj.board[y].unshift(obj.board[y][obj.board[y].length - 1]);
+          obj.board[y].pop();
+        }
+      }
       io.to(mv.room).emit('testReturned', returned);
     }
   }   
@@ -108,11 +116,11 @@ function enroqueLargo(tablero, Py, room){
   return tablero;
 }
 
-function actualitzarTaula() {
+function actualizarTaula() {
   io.emit('ok', listaPartidas);
 }
 
-function crearSala(socket){
+function crearSala(socket, data){
   let repe = true;
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
@@ -123,14 +131,15 @@ function crearSala(socket){
       estat: "Esperando...", 
       ids: new Array(), 
       players: 1, 
+      modalidad: data.modalidad,
       board: initBoard(), 
       jaqueActivo: 2, 
-      time1: 600, 
-      time2: 600, 
+      time1: data.tiempo * 60, 
+      time2: data.tiempo * 60, 
       turn: 0
     }); 
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
-    actualitzarTaula();
+    io.emit('ok', listaPartidas);
   }
 }
 
@@ -154,9 +163,8 @@ function joinSala(socket, data) {
 
           io.to(j.name).emit('tictoc', j); 
         }, 1000)     
-      }
-      
-      actualitzarTaula();
+      }    
+      io.emit('ok', listaPartidas);
     }
   }
 }
@@ -173,7 +181,7 @@ function borrarSala(socket){
       }
     }
   }
-  actualitzarTaula();
+  io.emit('ok', listaPartidas);
 }
 
 //INIT ARRAY FUNCTION
