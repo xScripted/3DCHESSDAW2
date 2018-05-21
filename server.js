@@ -28,8 +28,8 @@ function checkMove(socket, mv) {
     mode: "normal"
   }
   obj = listaPartidas.filter((e) => e.name == mv.room)[0];
+  if(typeof(obj) == "undefined" || typeof(obj.modalidad) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.mode = obj.modalidad;
-  if(typeof(obj) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.move = testMove(obj.board, mv);
   if(socket.id != obj.ids[obj.turn] || obj.board[mv.y1][mv.x1].color != obj.turn)returned.move = false;
   //Enroques
@@ -138,6 +138,7 @@ function crearSala(socket, data){
       time2: data.tiempo * 60, 
       turn: 0
     }); 
+    
     listaPartidas[listaPartidas.length - 1].ids.push(socket.id); //Llista de jugadors 
     io.emit('ok', listaPartidas);
   }
@@ -155,7 +156,11 @@ function joinSala(socket, data) {
       if(j.players == 2){       
         j.estat = 'En Partida';
         io.to(j.name).emit('newGame', j); 
-
+        if(j.modalidad == "Messy"){         
+          j.board[0] = j.board[0].sort(() => Math.random() - 0.5);
+          j.board[7] = j.board[7].sort(() => Math.random() - 0.5);
+          io.to(j.name).emit('messy', j.board); 
+        }
         let temps = setInterval(() => {
           if(j.turn == 0)j.time1 -= 1;
           if(j.turn == 1)j.time2 -= 1;
@@ -221,15 +226,16 @@ function initBoard(){
 
 //Constructor de Piezas
 function buildPieza(y, x, tipo, color, tmp){
-  tmp[y][x] = new Pieza(tipo, color);
+  tmp[y][x] = new Pieza(tipo, color, x);
   return tmp;
 }
 
 class Pieza {
-  constructor(tipo, color){
+  constructor(tipo, color, x){
       this.color = color;
       this.tipo = tipo; //Peon, torre, reina, etc...
       this.used = false; // Solo para torres y reyes
+      this.origx = x; //Para el modo Messy
   }
 }
 

@@ -88,6 +88,17 @@ socket.on('newGame', (info) => {
     loadTexts(info);
 })
 
+socket.on('messy', (board) => {
+    let tmp = new Array(8);
+    let tmp2 = new Array(8);
+    for(let k in piecesOBJ[0])piecesOBJ[0][k].position.x = board[0][k].origx; 
+    for(let k in piecesOBJ[7])piecesOBJ[7][k].position.x = board[7][k].origx; 
+    for(let k in piecesOBJ[0])tmp[piecesOBJ[0][k].position.x] = piecesOBJ[0][k];
+    piecesOBJ[0] = tmp;
+    for(let k in piecesOBJ[7])tmp2[piecesOBJ[7][k].position.x] = piecesOBJ[7][k];
+    piecesOBJ[7] = tmp2;
+});
+
 socket.on('mate', (ganador) => {
     let g = ["blancas", "negras"];
     alert("Ganan las " + g[ganador]);
@@ -325,8 +336,8 @@ function renderCasting() {
     for(let y of piecesOBJ)for(let x of y)if(x != 0)x.material.emissive.setHex(0x000000);
     if(intersects.length > 0){
         if(intersects[0].object.tipo == "piece"){    
-            old = intersects[0].object;        
-            old.material.emissive.setHex(0xff0000);    
+            old = intersects[0].object;                    
+            old.material.emissive.setHex(0x9900ff);  
         }
         if(intersects[0].object.tipo == "board" && old.position.x != intersects[0].object.position.x || old.position.z != intersects[0].object.position.z){
             socket.emit('test', {
