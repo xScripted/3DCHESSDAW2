@@ -8,11 +8,18 @@
     <script>
         window.onload = () => {
             go.addEventListener('click', () => self.location="chess.html");
+            titulo.addEventListener('click', () => {
+                form1.style.display = "grid";
+                form2.style.display = "none";
+            })
+            register.addEventListener('click', () => {
+                form1.style.display = "none";
+                form2.style.display = "grid";
+            })
             for(let k = 0; k < 200; k++)createParticle();
             var tagline = document.querySelectorAll("#tagline img");
             var tl = new TimelineLite();
             tl.staggerFrom(tagline, 0.5, {top:"-=30px", rotation:"180deg", alpha:0, scale: 2, ease: Expo.easeInOut}, 0.2);  
-            TweenMax.to(logo, 5, {rotation:"720deg", opacity: 1, ease:Back.easeOut.config(2)});     
         }
         function createParticle() {
             let p = document.createElement("div");
@@ -44,21 +51,32 @@
 </head>
 <body>
     <div id="portada"></div>
-    <div id="login">
-        <img id="logo" src="img/multiplayer.png">
-        <div id="tagline">
-            <img src="img/index/a.png">
-            <img src="img/index/j.png">
-            <img src="img/index/e.png">
-            <img src="img/index/3d.png">
-            <img src="img/index/d.png">
-        </div>        
-        <input type="text" placeholder="Nick">
-        <input type="password" placeholder="Password">
-        <br>
-        <input type="button" value="Iniciar Sesion">
-        <input type="button" value="Registrarse">
-        <input id="go" type="button" value="Jugar como invitado">    
+    <div id="contenedor">
+        <div id="titulo">
+            <div id="tagline">
+                <img src="img/index/a.png">
+                <img src="img/index/j.png">
+                <img src="img/index/e.png">
+                <img src="img/index/3d.png">
+                <img src="img/index/d.png">
+            </div>  
+        </div>  
+        <form id="form1" method="POST" action="/login">
+            <input name="nick" type="text" placeholder="Nick">
+            <input name="password" type="password" placeholder="Password">
+            <br>
+            <input type="submit" value="Iniciar Sesión">
+            <input id="register" type="button" value="Registrarse">
+            <input id="go" type="button" value="Jugar como invitado">  
+        </form>      
+        <form id="form2" method="POST" action="/signup">
+            <input name="nombre" type="text" placeholder="Nombre">
+            <input name="nick" type="text" placeholder="Nick">
+            <input name="email" type="email" placeholder="E-Mail">
+            <input name="password" type="password" placeholder="Password">
+            <br>
+            <input type="submit" value="Registrarse e Iniciar Sesion">
+        </form>   
     </div>
 </body>
 </html>

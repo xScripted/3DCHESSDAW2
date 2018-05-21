@@ -3,10 +3,11 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var path = __dirname.replace(/\\/g, '/');
 
 server.listen(3000);
-app.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'));
-app.use(express.static(__dirname + '/public'));
+app.get('/', (req, res) => res.sendFile(path + '/public/index.html'));
+app.use(express.static(path + '/public'));
 
 // Main <3
 io.on('connection', (socket) => {
@@ -450,3 +451,48 @@ function initArray(y,x){
   for(let j in tmp)tmp[j] = new Array(x).fill(0);
   return tmp;
 }
+
+////////////////////////////////////////////////////////////// USUARIOS
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose');
+const MONGO_URL = "mongodb://localhost:27017/auth";
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const passportConfig = require(path +'/config/passport');
+
+mongoose.Promise = global.Promise;
+mongoose.connect(MONGO_URL);
+mongoose.connection.on('error', (err) => {
+    throw err;
+    process.exit(1);
+})
+
+const Usuario = require(path + '/models/Usuario');
+
+app.use(session({
+    secret: 'toran', //Lo utiliza el algoritmo de criptografia
+    resave: true, //Guarda en cada llamada
+    saveUninitialized: true, //Guarda en la bd el objeto vacio
+    store: new MongoStore({
+        url: MONGO_URL,
+        autoReconnect: true
+    })
+}))
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}))
+
+app.get('/', (req, res) => res.sendFile(path + '/public/index.html'));
+app.use(express.static(path + '/public'));
+
+const controladorUsuario = require(path + '/controladores/usuario');
+app.post('/signup', controladorUsuario.postSignup);
+app.post('/login', controladorUsuario.postLogin);
+app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
+app.get('/profile', passportConfig.estaAutenticado, (req, res) => {
+    res.json(req.user);
+});
+
