@@ -1,130 +1,15 @@
 html, body{
     transition: 1s;
     margin: 0 auto;
-    height: 100%;
-    background-color: #292929;
-    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-#ct {
-    transition: .3s;
-    display: grid;
-    margin: auto;
     width: 100%;
     height: 100%;
-    max-width: 500px;
-    max-height: 500px;
-    background-color: #35ad47;
-    grid-template-rows: repeat(8, 1fr);
-    grid-template-columns: repeat(8, 1fr);
-    border: 2px solid;
-    font-size: 1px;
-}
-#ct div{
-    color: rgb(0, 0, 0);
-}
-#ct div img:hover {
-    cursor: grabbing;
-    cursor: -moz-grabbing;
-    cursor: -webkit-grabbing;
-}
-.cas_clara {
-    transition: .3s;
-    background-color: rgb(180, 255, 192);
-}
-.menu2 {
-    width: 200px;
-    color: white;
-    font-size: 21px;
-}
-#colorAll{
-    margin-left: 245px;
-}
-#modos {
-    margin-left: 200px;
-}
-#modos div {
-    padding: 20px;
-    padding-left: 50px;
-}
-#modos div:hover {
-    background-color: gray;
-}
-#colorAll input {
-    width: 100px;
-    height: 100px;
-    padding: 10px;
-    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.466);
-    border: 0px;
-}
-.marcador {
-    transition: .5s;
-    display: flex;
-    justify-content: space-between;
-    font-size: 25px;
-    color: white;
-    margin: auto;
-    width: 500px;
-    padding: 10px;
-    text-shadow: 0px 0px 1px black;
-}    
-b {
-    position: absolute;
-    margin-top: 15px;
-    margin-left: 10px;
-}
-#menu img:hover {
-    transition: .3s;
-    transform: rotate(45deg);
-}
-#menu img {
-    transition: .3s;
-    position: relative;
-    width: 50px;
-    height: 50px;
-    margin-left: -20px;
-}
-#menu {
-    overflow: hidden;
-    transition: 1s ease-in-out;
-    position: absolute;
-    height: 100%;
-    width: 50px;
-    background-color: #535353;
-    color: white;
-    box-shadow: 2px 0px 10px 5px rgba(0, 0, 0, 0.205);
-    z-index: 10; 
-}
-#menu2 {
-    transition: 3s;
-    overflow: hidden;
-    transition: 1s ease-in-out;
-    position: absolute;
-    width: 50px;
-    height: 100%;          
-    background-color: #313131;   
-    box-shadow: 2px 0px 10px 5px rgba(0, 0, 0, 0.205);    
-    z-index: 9;         
-}
-#menu:hover {
-    transition: .5s ease-in-out;
-    width: 220px;
-}
-#menu div {
-    position: relative;
-    transition: .3s;
-    padding: 10px;
-    padding-left: 20px;
-    width: 250px;            
-}        
-#menu div:hover {
-    transition: .3s;
-    background-color: #252525;
+    background-color: #292929;
+    font-family: Montserrat, sans-serif;
 }
 
 #multiplayer {
     position: relative;
-    display: none;
+    display: block;
     margin: auto;
     width: 50%;
     height: 700px;          
@@ -134,45 +19,46 @@ b {
 #crearysalir {
     display: block;
     margin-top: 20px;
-
 }
 #crearysalir * {
-    padding: 10px;
+    padding: 20px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    margin-right: 10px;
 }
 
-#taula {
-    position: relative;
-    margin-top: 20px;
-    width: 90%;
-    border: 2px solid black;
-    background-color: white;
+#modalidad {
+    padding: 0px;
+}
+table{
+    width: 100%;
+    border-spacing: 0; 
     text-align: center;
 }
-#taula > div {
-    display: flex;
+input {
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
 }
-#taula > div > div {
-    width: 100%;
-    padding: 20px;
-}
-#taula > div > div:last-child {
-    padding: 5px;
-}
-#taula > div:nth-child(even) {
+
+#taula tr:nth-child(even){background-color: red;}
+
+table td:nth-child(even) {
     background-color: lightgray;
 }
-#taula > div:first-child {
-    font-weight: bold;
-    background-color: grey;
-}
-#taula > div:first-child > div{
+
+input[value="Entrar"] {
     padding: 20px;
 }
-.unirse {
-    padding: 15px;
+
+
+#taula td, #taula th{
+    padding: 20px;
+    background-color: white;
 }
+
 #board3D {
     overflow: hidden;
+    display: none;
     position: relative;
     margin: auto;
     width: 100%;

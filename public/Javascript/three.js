@@ -82,8 +82,8 @@ socket.on('newGame', (info) => {
     modo = info.modalidad;
     removePieces();
     //genPieces();
-    room = info.ids[0]; //Guardem en quina room esta       
-    chess.style.display = 'block'; 
+    room = info.ids[0]; //Guardem en quina room esta   
+    board3D.style.display = 'block'; 
     multiplayer.style.display = 'none';
     loadTexts(info);
 })
@@ -111,6 +111,7 @@ function init() {
     //Obtenim les dimensions del contenidor tablero3D
     width  = board3D.clientWidth;
     height = board3D.clientHeight;
+    console.log(width, height);
 
     //Iniciem variables base
     scene = new THREE.Scene();//         FOV  ASPECT RATIO                           NEAR FAR

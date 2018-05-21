@@ -12,9 +12,9 @@ function client() {
     inputs[0].addEventListener("click", () => socket.emit('crearSala', {modalidad: modalidad.value, tiempo: tiempo.value}));
     inputs[2].addEventListener("click", () => socket.emit('borrarSala'));
     socket.on('ok', (listaPartidas) => {
-        let taulaHTML = "<div><div>Sala</div><div>Jugadores</div><div>Tiempo</div><div>Modo</div><div>Estado</div><div>Entrar</div></div></div>";
-        for(let j of listaPartidas)taulaHTML += `<div><div>${j.name.slice(0,3)}</div><div>${j.players}/2</div><div>${toTimeSystem(j.time1)} ${toTimeSystem(j.time2)}</div><div>${j.modalidad}</div><div>${j.estat}</div><div><input class="unirse" type="button" data='${j.name}' value="Entrar"></div></div>`;
-        taula.innerHTML = taulaHTML;
+        let taulaHTML = "<table><tr><th>Sala</th><th>Jugadores</th><th>Tiempo</th><th>Modo</th><th>Estado</th><th>Entrar</th></tr>";
+        for(let j of listaPartidas)taulaHTML += `<tr><td>${j.name.slice(0,3)}</td><td>${j.players}/2</td><td>${toTimeSystem(j.time1)}<br>${toTimeSystem(j.time2)}</td><td>${j.modalidad}</td><td>${j.estat}</td><td><input class="unirse" type="button" data='${j.name}' value="Entrar"></td></tr>`;
+        taula.innerHTML = taulaHTML + "</table>";
         let partidasUnise = document.querySelectorAll(".unirse");
         for(let j of partidasUnise)j.addEventListener("click", () => {
             socket.emit('joinSala', j.getAttribute("data"));
@@ -22,24 +22,7 @@ function client() {
             j1 = false;
         });  
     })
-
     //socket.on('helper', (obj) => console.table(obj.board));
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //MENUS
-    var lista1 = document.querySelectorAll("#menu div");
-
-    //Multiplayer
-    lista1[3].addEventListener("click", () => {
-        chess.style.display = "none";
-        multiplayer.style.display = "block";
-    })
-    menu2.addEventListener("mouseout",  () => {menu2.style.width = "50px"; menu.style.width = "50px"});
-    menu2.addEventListener("mouseover", () => {menu2.style.width = "400px"; menu.style.width = "220px"});
-    menu.addEventListener("mouseover",  () => menu.style.width = "220px");
-    menu.addEventListener("mouseout", () => {
-        menu2.style.width = "50px";
-        menu.style.width = "50px";
-    })   
 } 
     
 

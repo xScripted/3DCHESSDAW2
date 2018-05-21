@@ -117,14 +117,12 @@ function enroqueLargo(tablero, Py, room){
   return tablero;
 }
 
-function actualizarTaula() {
-  io.emit('ok', listaPartidas);
-}
 
 function crearSala(socket, data){
   let repe = true;
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
+    io.emit('ok', listaPartidas);
     socket.join(socket.id); //Creem la sala 
     // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas.push({
@@ -154,7 +152,8 @@ function joinSala(socket, data) {
       j.players += 1; 
 
       // NEW GAME
-      if(j.players == 2){       
+      if(j.players == 2){  
+        io.emit('ok', listaPartidas);     
         j.estat = 'En Partida';
         io.to(j.name).emit('newGame', j); 
         if(j.modalidad == "Messy"){         
@@ -460,6 +459,7 @@ const MONGO_URL = "mongodb://localhost:27017/auth";
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const passportConfig = require(path +'/config/passport');
+const controladorUsuario = require(path + '/controladores/usuario');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(MONGO_URL);
@@ -484,11 +484,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
-
-app.get('/', (req, res) => res.sendFile(path + '/public/index.html'));
-app.use(express.static(path + '/public'));
-
-const controladorUsuario = require(path + '/controladores/usuario');
 app.post('/signup', controladorUsuario.postSignup);
 app.post('/login', controladorUsuario.postLogin);
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
