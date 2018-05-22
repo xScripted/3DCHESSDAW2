@@ -6,13 +6,13 @@ exports.postSignup = (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         nick: req.body.nick,
-        nombre: req.body.nombre
+        nombre: req.body.nombre,
+        elo: 1000
     })
     Usuario.findOne({nick: req.body.nick}, (err, usuarioExistente) => {
         if(usuarioExistente){
             return res.status(400).send('Ya existe este usuario');
         }
-        console.log("AQUI",req.body);
         nuevoUsuario.save((err) => {
             if(err){
                 next(err);

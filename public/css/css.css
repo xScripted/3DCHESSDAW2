@@ -9,7 +9,7 @@ html, body{
 
 #multiplayer {
     position: relative;
-    display: block;
+    z-index: 1;
     margin: auto;
     width: 50%;
     height: 700px;          
@@ -58,9 +58,8 @@ input[value="Entrar"] {
 
 #board3D {
     overflow: hidden;
-    display: none;
-    position: relative;
-    margin: auto;
+    position: absolute;
+    z-index: -1;
     width: 100%;
     height: 100vh;
 }

@@ -83,8 +83,8 @@ socket.on('newGame', (info) => {
     removePieces();
     //genPieces();
     room = info.ids[0]; //Guardem en quina room esta   
-    board3D.style.display = 'block'; 
-    multiplayer.style.display = 'none';
+    board3D.style.zIndex = 1; 
+    multiplayer.style.zIndex = -1;
     loadTexts(info);
 })
 

@@ -9,7 +9,9 @@ var j1 = true; //Indica si es el jugador 1 o 2;
 function client() {
     //Socket IO
     var inputs = document.querySelectorAll("#crearysalir input");
-    inputs[0].addEventListener("click", () => socket.emit('crearSala', {modalidad: modalidad.value, tiempo: tiempo.value}));
+    inputs[0].addEventListener("click", () => {
+        socket.emit('crearSala', {modalidad: modalidad.value, tiempo: tiempo.value});
+    })
     inputs[2].addEventListener("click", () => socket.emit('borrarSala'));
     socket.on('ok', (listaPartidas) => {
         let taulaHTML = "<table><tr><th>Sala</th><th>Jugadores</th><th>Tiempo</th><th>Modo</th><th>Estado</th><th>Entrar</th></tr>";

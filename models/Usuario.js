@@ -6,7 +6,9 @@ const usuarioSchema = new Schema({
     email:    {type: String, unique: true, lowercase: true},
     password: {type: String, required: true},
     nick:     {type: String, required: true, unique: true},
-    nombre:   {type: String}
+    nombre:   {type: String},
+    foto:     {type: String},
+    elo:      {type: Number}
 }, {
     timestamps: true //Indica cuando fue creado
 })

@@ -35,9 +35,9 @@ function checkMove(socket, mv) {
   if(socket.id != obj.ids[obj.turn] || obj.board[mv.y1][mv.x1].color != obj.turn)returned.move = false;
   //Enroques
   if(obj != 0){ //Prescindible creo
-    if(obj.board[mv.y1][0].tipo == "torre" && !(obj.board[mv.y1][0].used) && testJaque(obj.board) == 2 && !(obj.board[mv.y1][3].
-      used) && obj.board[mv.y1][mv.x1].tipo == "rey" && 
-    obj.board[mv.y1][0].color == obj.board[mv.y1][3].color && obj.board[mv.y1][1] == 0 && obj.board[mv.y1][2] == 0 && mv.x2 == 1 && (mv.y2 == 0 || mv.y2 == 7)){
+    if(obj.board[mv.y1][0].tipo == "torre" && !(obj.board[mv.y1][0].used) && testJaque(obj.board) == 2 && !(obj.board[mv.y1][3].used) && 
+    obj.board[mv.y1][mv.x1].tipo == "rey" && obj.modalidad == "Normal" && obj.board[mv.y1][0].color == obj.board[mv.y1][3].color && 
+    obj.board[mv.y1][1] == 0 && obj.board[mv.y1][2] == 0 && mv.x2 == 1 && (mv.y2 == 0 || mv.y2 == 7)){
       if(mv.y1 == 0)obj.board = enroqueCorto(obj.board, 0, mv.room);
       if(mv.y1 == 7)obj.board = enroqueCorto(obj.board, 7, mv.room);
       returned.move = true;
@@ -460,6 +460,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const passportConfig = require(path +'/config/passport');
 const controladorUsuario = require(path + '/controladores/usuario');
+const ejs = require('ejs');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(MONGO_URL);
@@ -483,11 +484,11 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({extended: true}));
 app.post('/signup', controladorUsuario.postSignup);
-app.post('/login', controladorUsuario.postLogin);
+app.post('/chess', controladorUsuario.postLogin);
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
-app.get('/profile', passportConfig.estaAutenticado, (req, res) => {
-    res.json(req.user);
+app.get('/profile', passportConfig.estaAutenticado, (req, res) => {  
+  res.render('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/views/perfil.ejs', {user: req.user});
 });
 
