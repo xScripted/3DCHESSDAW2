@@ -1,9 +1,12 @@
 var listaPartidas = new Array();
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
-var path = __dirname.replace(/\\/g, '/');
+var listaPlayers = new Array();
+const express = require('express');
+const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const path = "/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";//__dirname.replace(/\\/g, '/');
+var nombre;
+ 
 
 server.listen(3000);
 app.get('/', (req, res) => res.sendFile(path + '/public/index.html'));
@@ -11,7 +14,9 @@ app.use(express.static(path + '/public'));
 
 // Main <3
 io.on('connection', (socket) => {
-  socket.on('crearSala',(tm) => crearSala(socket, tm));
+  let nick = "user";
+  app.get('/nick', (req, res) => nick = req.user);
+  socket.on('crearSala',(tm) => crearSala(socket, tm, nick));
   socket.on('disconnect', () => borrarSala(socket));
   socket.on('borrarSala', () => borrarSala(socket));
   socket.on('joinSala', (id) => joinSala(socket,id));
@@ -118,7 +123,7 @@ function enroqueLargo(tablero, Py, room){
 }
 
 
-function crearSala(socket, data){
+function crearSala(socket, data, nick){
   let repe = true;
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
@@ -127,6 +132,7 @@ function crearSala(socket, data){
     // Creem un objecte de la sala i la introduim al array de salas
     listaPartidas.push({
       name: socket.id, 
+      nick: nick,
       estat: "Esperando...", 
       ids: new Array(), 
       players: 1, 
@@ -486,9 +492,10 @@ app.use(passport.session());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.post('/signup', controladorUsuario.postSignup);
-app.post('/chess', controladorUsuario.postLogin);
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
 app.get('/profile', passportConfig.estaAutenticado, (req, res) => {  
-  res.render('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/views/perfil.ejs', {user: req.user});
+
+  res.render(path + '/public/views/perfil.ejs', {user: req.user});
 });
+app.post('/chess', controladorUsuario.postLogin);
 

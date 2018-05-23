@@ -1,6 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const Usuario = require('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/models/Usuario');
+const Usuario = require('/home/miquel/Escritorio/aje3d/3DCHESSDAW2//models/Usuario');
 
 passport.serializeUser((usuario, done) => {
     done(null, usuario._id);

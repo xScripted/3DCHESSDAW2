@@ -1,5 +1,5 @@
 const passport = require('passport');
-const Usuario = require('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/models/Usuario');
+const Usuario = require('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/models/Usuario');
 
 exports.postSignup = (req, res, next) => {
     const nuevoUsuario = new Usuario({
@@ -21,7 +21,7 @@ exports.postSignup = (req, res, next) => {
                 if (err) {
                     next(err);
                 }
-                res.sendFile('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/chess.html');
+                res.sendFile('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/public/chess.html');
             });
         })
     })
@@ -38,8 +38,9 @@ exports.postLogin = (req, res, next) => {
         req.logIn(usuario, (err) => {
             if (err){
                 next(err);
-            }
-            res.sendFile('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/chess.html');
+            }            
+            res.sendFile('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/public/chess.html');
+            res.end({nick: req.user.nick});
         })
     })(req, res, next);
 }

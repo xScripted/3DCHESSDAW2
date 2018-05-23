@@ -239,6 +239,7 @@ function bornPiece(obj,z,x,color,raza = "default") {
     piecesOBJ[z][x] = obj;
     scene.add(obj);
 }
+
 function animate(){
     requestAnimationFrame(animate);  //Fa la funcio d'un setInterval   
     if(typeof(mv) === "object"){
