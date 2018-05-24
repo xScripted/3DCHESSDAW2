@@ -1,5 +1,7 @@
 const passport = require('passport');
 const Usuario = require('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/models/Usuario');
+const mongoose = require('mongoose');
+const MONGO_URL = "mongodb://localhost:27017/auth";
 
 exports.postSignup = (req, res, next) => {
     const nuevoUsuario = new Usuario({
@@ -40,10 +42,10 @@ exports.postLogin = (req, res, next) => {
                 next(err);
             }            
             res.sendFile('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/public/chess.html');
-            res.end({nick: req.user.nick});
         })
     })(req, res, next);
 }
+
 
 exports.logout = (req, res) => {
     req.logout();
