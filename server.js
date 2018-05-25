@@ -37,7 +37,6 @@ function checkMove(socket, mv) {
     mode: "normal"
   }
   obj = listaPartidas.filter((e) => e.name == mv.room)[0];
-  partidaAcabada(obj, mv);
   if(typeof(obj) == "undefined" || typeof(obj.modalidad) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.mode = obj.modalidad;
   returned.move = testMove(obj.board, mv);
@@ -506,6 +505,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.post('/signup', controladorUsuario.postSignup, (req, res) => {
   res.render(path + '/public/views/chess.ejs', {user: req.user});
 });
+app.get('/ranking', (req, res) => {
+  Usuario.find({}, (err, todo) => {    
+    todo = Array.from(todo);    
+    res.render(path + '/public/views/ranking.ejs', {data: todo.sort((a, b) => a.elo < b.elo)});
+  });
+})
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
 app.post('/chess', controladorUsuario.postLogin, (req, res) => {
   res.render(path + '/public/views/chess.ejs', {user: req.user});

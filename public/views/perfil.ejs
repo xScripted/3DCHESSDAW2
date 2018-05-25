@@ -19,7 +19,7 @@
         grid-gap: 2%;
         grid-column-gap: 10%;
         grid-template-columns: 1fr 2fr;
-        grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
         margin: auto;
         width: 60%;    
         min-width: 500px;    
@@ -113,6 +113,10 @@
         <div id="foto"></div>
         <div><%= user.nick %></div>
         <div><%= user.elo %></div>
+        <div class="labels">VDE</div>
+        <div class="datos"><%= user.victorias %> / <%= user.derrotas %> / <%= user.empates %></div>
+        <div class="labels">TIEMPO PENSANDO</div>
+        <div class="datos"><%= user.time %> min</div>
         <div class="labels">NOMBRE COMPLETO</div>
         <div class="datos"><%= user.nombre %></div>
         <div class="labels">E-MAIL</div>

@@ -297,6 +297,13 @@ function animate(){
     }
     renderer.render(scene, camera); //Renderitza l'escena a 60 frames 
 }
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+}
 
 //INIT ARRAY FUNCTION
 function initArray(y,x){
