@@ -369,12 +369,11 @@ function removePieces() {
 }
 
 function loadTexts(info) {
-    console.log("INFO:", info);
     var loader = new THREE.FontLoader();
     var material = new THREE.MeshBasicMaterial({color: "black"});
 
     loader.load( 'helvetiker_regular.typeface.json', (font) => {
-        var geometry = new THREE.TextGeometry( `User${info.ids[0].slice(0,3)}`, {
+        var geometry = new THREE.TextGeometry( `${info.player1.nick} ${info.player1.elo}`, {
             font: font,
             size: 1,
             height: 0.05,
@@ -385,14 +384,14 @@ function loadTexts(info) {
         texto1.rotateX(-60 * Math.PI / 180);
         texto1.name = "texto1";
 
-        var geometry2 = new THREE.TextGeometry( `User${info.ids[1].slice(0,3)}`, {
+        var geometry2 = new THREE.TextGeometry( `${info.player2.elo} ${info.player2.nick}`, {
             font: font,
             size: 1,
             height: 0.05,
             curveSegments: 20,
         });
         var texto2 = new THREE.Mesh(geometry2, material);
-        texto2.position.set(5, -1, -3);
+        texto2.position.set(8, -1, -3);
         texto2.rotateX(60 * Math.PI / 180);
         texto2.rotateY(180 * Math.PI / 180);
         texto2.name = "texto2";

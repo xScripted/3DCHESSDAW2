@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const path = "/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";//__dirname.replace(/\\/g, '/');
+const path = __dirname.replace(/\\/g, '/'); //"/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";
  
 
 server.listen(3000);
@@ -12,10 +12,17 @@ app.use(express.static(path + '/public'));
 
 // Main <3
 io.on('connection', (socket) => {
-  socket.on('crearSala',(tm) => crearSala(socket, tm));
+  socket.emit('ok', listaPartidas);
+  var nick = "user" + socket.id.slice(0,3);
+  var elo  = "";
+  socket.on('getData', (user) => {
+    nick = user.nick;
+    elo  = user.elo; 
+  });
+  socket.on('crearSala',(tm) => crearSala(socket, tm, nick, elo));
   socket.on('disconnect', () => borrarSala(socket));
   socket.on('borrarSala', () => borrarSala(socket));
-  socket.on('joinSala', (id) => joinSala(socket,id));
+  socket.on('joinSala', (id) => joinSala(socket, id, nick, elo));
   socket.on('test',     (mv) => checkMove(socket, mv));
 });
 
@@ -30,6 +37,7 @@ function checkMove(socket, mv) {
     mode: "normal"
   }
   obj = listaPartidas.filter((e) => e.name == mv.room)[0];
+  partidaAcabada(obj, mv);
   if(typeof(obj) == "undefined" || typeof(obj.modalidad) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.mode = obj.modalidad;
   returned.move = testMove(obj.board, mv);
@@ -75,7 +83,7 @@ function checkMove(socket, mv) {
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       //console.log("Jaque: " + obj.jaqueActivo); MIRAR QUIN JAQUE ESTA ACTIU
-      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo))io.to(mv.room).emit('mate', obj.turn); ;        
+      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo)) partidaAcabada(obj, mv);        
 
       //Coronaciones 
       if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 1 && mv.y2 == 0){
@@ -118,8 +126,13 @@ function enroqueLargo(tablero, Py, room){
   return tablero;
 }
 
+function partidaAcabada(obj, mv) {
+  Usuario.update({nick: eval(`obj.player${obj.turn + 1}.nick`)}, { $inc: { victorias: 1, games: 1, time: obj.time - obj.time1, elo: 30 }}, (err, user) => console.log(user));
+  Usuario.update({nick: eval(`obj.player${1 - obj.turn + 1}.nick`)}, { $inc: { derrotas: 1, games: 1, time: obj.time - obj.time1, elo: -30}}, (err, user) => console.log(user));
+  io.to(mv.room).emit('mate', obj.turn);
+}
 
-function crearSala(socket, data) {
+function crearSala(socket, data, nick, elo) {
   let repe = true;
   for(let j of listaPartidas)if(j.name == socket.id)repe = false;
   if(repe){
@@ -129,11 +142,14 @@ function crearSala(socket, data) {
     listaPartidas.push({
       name: socket.id, 
       estat: "Esperando...", 
+      player1: {nick: nick, elo: elo},
+      player2: {nick: "user", elo: ""},
       ids: new Array(), 
       players: 1, 
       modalidad: data.modalidad,
       board: initBoard(), 
       jaqueActivo: 2, 
+      time: data.tiempo * 60,
       time1: data.tiempo * 60, 
       time2: data.tiempo * 60, 
       turn: 0
@@ -144,13 +160,15 @@ function crearSala(socket, data) {
   }
 }
 
-function joinSala(socket, data) {
+function joinSala(socket, data, nick, elo) {
   for(let j of listaPartidas){
     if(j.name == data && j.players < 2 && socket.id != data){
       borrarSala(socket);
       socket.join(data);
       j.ids.push(socket.id);    
       j.players += 1; 
+      j.player2.nick = nick;
+      j.player2.elo = elo;
 
       // NEW GAME
       if(j.players == 2){  
@@ -485,11 +503,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.post('/signup', controladorUsuario.postSignup);
+app.post('/signup', controladorUsuario.postSignup, (req, res) => {
+  res.render(path + '/public/views/chess.ejs', {user: req.user});
+});
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
-app.post('/chess', controladorUsuario.postLogin);
+app.post('/chess', controladorUsuario.postLogin, (req, res) => {
+  res.render(path + '/public/views/chess.ejs', {user: req.user});
+});
 app.get('/profile', passportConfig.estaAutenticado, (req, res) => {  
-
   res.render(path + '/public/views/perfil.ejs', {user: req.user});
 });
 

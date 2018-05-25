@@ -14,12 +14,16 @@
     <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/TextureLoader.js"></script>
     <script type="text/javascript" charset="utf8" src="Javascript/three.js"></script>
 </head>
+<script>
+
+    socket.emit('getData', {nick: '<%= user.nick %>', elo: '<%= user.elo %>'});
+</script>
 <body>
     <div id="menu">
         <div> PERFIL </div>
         <div> RANKING </div>   
         <div> HOME </div>
-        <div> LOGIN</div>
+        <div> <%= user.nick %></div>
         <div> LOGOUT</div>
     </div>
     <div id="board3D"></div>

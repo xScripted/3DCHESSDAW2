@@ -8,7 +8,12 @@ const usuarioSchema = new Schema({
     nick:     {type: String, required: true, unique: true},
     nombre:   {type: String},
     foto:     {type: String},
-    elo:      {type: Number}
+    elo:      {type: Number},
+    victorias:{type: Number},
+    derrotas: {type: Number},
+    empates:  {type: Number},
+    games:    {type: Number},
+    time:     {type: Number},
 }, {
     timestamps: true //Indica cuando fue creado
 })

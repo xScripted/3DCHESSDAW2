@@ -1,15 +1,20 @@
 const passport = require('passport');
-const Usuario = require('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/models/Usuario');
+const Usuario = require('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/models/Usuario');
 const mongoose = require('mongoose');
 const MONGO_URL = "mongodb://localhost:27017/auth";
 
 exports.postSignup = (req, res, next) => {
     const nuevoUsuario = new Usuario({
+        io: "nothing",
         email: req.body.email,
         password: req.body.password,
         nick: req.body.nick,
         nombre: req.body.nombre,
-        elo: 1000
+        elo: 1000,
+        victorias: 0,
+        derrotas:  0,
+        empates:   0,
+        games:     0
     })
     Usuario.findOne({nick: req.body.nick}, (err, usuarioExistente) => {
         if(usuarioExistente){
@@ -23,7 +28,7 @@ exports.postSignup = (req, res, next) => {
                 if (err) {
                     next(err);
                 }
-                res.sendFile('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/public/chess.html');
+                next();
             });
         })
     })
@@ -41,7 +46,7 @@ exports.postLogin = (req, res, next) => {
             if (err){
                 next(err);
             }            
-            res.sendFile('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/public/chess.html');
+            next();
         })
     })(req, res, next);
 }
@@ -49,5 +54,5 @@ exports.postLogin = (req, res, next) => {
 
 exports.logout = (req, res) => {
     req.logout();
-    res.send("Hasta pronto ! ");
+    res.sendFile('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/index.html');
 }
