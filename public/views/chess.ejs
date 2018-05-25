@@ -17,17 +17,18 @@
 <script>
     socket.emit('getData', {nick: '<%= user.nick %>', elo: '<%= user.elo %>'});
     socket.on('mate', (info) => {
-        setTimeout(() => {
-            let html = "";
-            let color = ["blancas", "negras"];
-            informe.style.display = "grid";
-            html = `<div>Han ganado las ${color[info.turn]}</div>`;
-            html += `<div>${info.player1.nick} <span>+30<span></div>`;
-            html += `<div>${info.player2.nick} <span>-30<span></div>`;
-            html += `<div>Volver</div>`;
-            informe.innerHTML = html;
-        }, 1000)
-    });
+    setTimeout(() => {
+        let html = "";
+        let color = ["blancas", "negras"];
+        informe.style.display = "grid";
+        html = `<div>Han ganado las ${color[info.turn]} !</div>`;
+        html += `<div>${info.player1.nick} <span id='green'>+30</span></div>`;
+        html += `<div>${info.player2.nick} <span id='red'>-30</span></div>`;
+        html += `<div id='volver'>Volver</div>`;
+        informe.innerHTML = html;
+        volver.addEventListener('click', () => location.reload());
+    }, 1000)
+});
 </script>
 <body>
     <div id="informe">

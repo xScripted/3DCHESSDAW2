@@ -88,10 +88,11 @@
                 <th>Victorias</th>
                 <th>Derrotas</th>
                 <th>Empates</th>
-                <th>Tiempo jugado</th>
+                <th>Partidas</th>
+                <th>Tiempo</th>
             </tr>
             <% for(var x of data) {%>
-                <tr><td><%= x.nick %></td><td><%= x.elo %></td><td><%= x.victorias %></td><td><%= x.derrotas %></td><td><%= x.empates %></td><td><%= x.time %> min</td>  <% } %></tr>
+            <tr><td><%= x.nick %></td><td><%= x.elo %></td><td><%= x.victorias %></td><td><%= x.derrotas %></td><td><%= x.empates %></td><td><%= x.games %></td><td><%= x.time %> min</td>  <% } %></tr>
         </table>
     </div>
 </body>

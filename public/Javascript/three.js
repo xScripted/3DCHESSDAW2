@@ -11,7 +11,7 @@ var color1 = "#FFEEC7", color2 = "#0099ff";
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(), old;
 var texture = new THREE.TextureLoader().load('img/glass.png');//Textura
-var texture2 = new THREE.TextureLoader().load('img/rock.png');//Textura
+var texture2 = new THREE.TextureLoader().load('img/wood0.png');//Textura
 var mv; // Obj de los movimientos
 var wz = 2, bz = 5, wx = 9, bx = 9;
 var subid = 0;
@@ -100,13 +100,13 @@ socket.on('messy', (board) => {
 });
 
 socket.on('tictoc', (info) => loadTimers(info));
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function init() {
     //Obtenim les dimensions del contenidor tablero3D
     width  = board3D.clientWidth;
     height = board3D.clientHeight;
-    console.log(width, height);
 
     //Iniciem variables base
     scene = new THREE.Scene();//         FOV  ASPECT RATIO                           NEAR FAR
@@ -238,18 +238,21 @@ function bornPiece(obj,z,x,color,raza = "default") {
 function animate(){
     requestAnimationFrame(animate);  //Fa la funcio d'un setInterval   
     if(typeof(mv) === "object"){
-        if(piecesOBJ[mv.y1][mv.x1].position.z < mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z + 0.1) * 10) / 10;
-        if(piecesOBJ[mv.y1][mv.x1].position.x < mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x + 0.1) * 10) / 10;
-        if(piecesOBJ[mv.y1][mv.x1].position.z > mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z - 0.1) * 10) / 10;
-        if(piecesOBJ[mv.y1][mv.x1].position.x > mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x - 0.1) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.z < mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z + 0.2) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.x < mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x + 0.2) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.z > mv.y2)piecesOBJ[mv.y1][mv.x1].position.z = Math.round((piecesOBJ[mv.y1][mv.x1].position.z - 0.2) * 10) / 10;
+        if(piecesOBJ[mv.y1][mv.x1].position.x > mv.x2)piecesOBJ[mv.y1][mv.x1].position.x = Math.round((piecesOBJ[mv.y1][mv.x1].position.x - 0.2) * 10) / 10;
 
         //Caballo Salto
         if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && mv.horseUp){
             piecesOBJ[mv.y1][mv.x1].position.y += 0.5; // Pujada
             if(piecesOBJ[mv.y1][mv.x1].position.y >= 4)mv.horseUp = false; // Punt maxim i baixada
-        }else if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && piecesOBJ[mv.y1][mv.x1].position.y > 1) {
-            piecesOBJ[mv.y1][mv.x1].position.y -= 0.5; // Baixada
+        } 
+        
+        if(piecesOBJ[mv.y1][mv.x1].raza == "knight" && piecesOBJ[mv.y1][mv.x1].position.y > 1 && !(mv.horseUp)) {
+            piecesOBJ[mv.y1][mv.x1].position.y -= 0.2; // Baixada
         }
+
         //Enroque Corto
         if(enroqueC == 0){
             piecesOBJ[0][2].position.x = Math.round((piecesOBJ[0][2].position.x + 0.1) * 10) / 10;
@@ -272,7 +275,7 @@ function animate(){
         }
 
         //Animacion finaltzada
-        if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2){
+        if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2 && piecesOBJ[mv.y1][mv.x1].position.y <= 1){
             //Reposicionar
             piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];
             piecesOBJ[mv.y1][mv.x1] = 0;
@@ -374,7 +377,7 @@ function loadTexts(info) {
     var material = new THREE.MeshBasicMaterial({color: "black"});
 
     loader.load( 'helvetiker_regular.typeface.json', (font) => {
-        var geometry = new THREE.TextGeometry( `${info.player1.nick} ${info.player1.elo}`, {
+        var geometry = new THREE.TextGeometry( `${info.player2.nick} ${info.player2.elo}`, {
             font: font,
             size: 1,
             height: 0.05,
@@ -385,7 +388,7 @@ function loadTexts(info) {
         texto1.rotateX(-60 * Math.PI / 180);
         texto1.name = "texto1";
 
-        var geometry2 = new THREE.TextGeometry( `${info.player2.elo} ${info.player2.nick}`, {
+        var geometry2 = new THREE.TextGeometry( `${info.player1.elo} ${info.player1.nick}`, {
             font: font,
             size: 1,
             height: 0.05,
@@ -435,6 +438,8 @@ function loadTexts(info) {
 }
 
 function loadTimers(info){    
+    var black = new THREE.MeshBasicMaterial({color: "black"});
+    var blue = new THREE.MeshBasicMaterial({color: "blue"});
     var loader = new THREE.FontLoader();
     loader.load( 'helvetiker_regular.typeface.json', (font) => {
         var geometry = new THREE.TextGeometry(toTimeSystem(info.time1), {
@@ -450,6 +455,14 @@ function loadTimers(info){
             height: 0.02,
             curveSegments: 20,
         });    
+
+        if(info.turn == 0) {
+            scene.getObjectByName("timer1").material = blue;
+            scene.getObjectByName("timer2").material = black;
+        } else {
+            scene.getObjectByName("timer1").material = black;
+            scene.getObjectByName("timer2").material = blue;
+        }
         scene.getObjectByName("timer1").geometry = geometry;
         scene.getObjectByName("timer2").geometry = geometry2;
     })

@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const path = "/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";//__dirname.replace(/\\/g, '/');
+const path = __dirname.replace(/\\/g, '/');//"/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";
  
 
 server.listen(3000);
@@ -36,6 +36,7 @@ function checkMove(socket, mv) {
     mode: "normal"
   }
   obj = listaPartidas.filter((e) => e.name == mv.room)[0];
+  partidaAcabada(obj, mv);
   if(typeof(obj) == "undefined" || typeof(obj.modalidad) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.mode = obj.modalidad;
   returned.move = testMove(obj.board, mv);

@@ -47,23 +47,37 @@ html, body{
     position: absolute;
     font-size: 20px;
     grid-template-columns: 1fr;
-    grid-template-rows: 2fr 1fr 1fr 1fr;
-    justify-self: center;
-    align-self: center;
+    grid-template-rows: 5fr 4fr 4fr 4fr;
+    padding-top: 20px;
+    text-align: center;
     margin: auto;
     left: 0;
     right: 0;
     top: 200px;
-    width: 40%;
-    height: 500px;
-    background-color: rgb(255, 255, 255);
+    width: 300px;
+    height: 240px;
+    background-color: rgb(212, 212, 212);
     z-index: 20;
+    box-shadow: 0px 0px 5px black;
 }
 span:nth-child(0){
     color: green;
 }
 span:nth-child(1) {
     color: red;
+}
+#volver {
+    transition: 0.3s;
+    padding: 20px;
+    margin: 50px;
+    border: 2px solid;
+}
+
+#volver:hover {
+    transition: 0.3s;
+    padding: 20px;
+    box-shadow: inset 0px 0px 5px black;
+    background-color: rgba(0, 0, 0, 0.438);
 }
 #menu * {
     transition: 0.3s;
@@ -91,6 +105,8 @@ table{
 #taula td, #taula th{
     padding: 20px;
 }
+#green {color: green}
+#red {color: red}
 
 input {
     font-family: Montserrat, sans-serif;

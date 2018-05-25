@@ -1,5 +1,5 @@
 const passport = require('passport');
-const Usuario = require('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/models/Usuario');
+const Usuario = require('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/models/Usuario');
 const mongoose = require('mongoose');
 const MONGO_URL = "mongodb://localhost:27017/auth";
 
@@ -55,5 +55,5 @@ exports.postLogin = (req, res, next) => {
 
 exports.logout = (req, res) => {
     req.logout();
-    res.sendFile('/home/miquel/Escritorio/aje3d/3DCHESSDAW2/public/index.html');
+    res.sendFile('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/index.html');
 }
