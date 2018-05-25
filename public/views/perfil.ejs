@@ -98,7 +98,27 @@
         z-index: 5;
         font-family: Montserrat, sans-serif;
     }
+    input {
+        position: absolute;
+    }
 </style>
+<script>
+    window.onload = () => {
+        imagen.addEventListener('change', (evt) => {
+            let file = evt.target.files[0];
+            let reader = new FileReader();
+            reader.onload = (evt) => {
+                fotofile.style.backgroundImage = `url(${evt.target.result})`;                
+            }
+            reader.readAsDataURL(file);
+        })
+        let minis = document.querySelectorAll('#menu *');
+        minis[0].addEventListener('click', () => self.location='/profile');
+        minis[1].addEventListener('click', () => self.location='/ranking');
+        minis[2].addEventListener('click', () => self.location='/');
+        minis[4].addEventListener('click', () => self.location='/logout');
+    }
+</script>
 <body>    
     <div id="particles"></div>
     <script src="../Javascript/particles.js"></script>
@@ -106,11 +126,13 @@
             <div> PERFIL </div>      
             <div> RANKING </div>   
             <div> HOME </div>
-            <div> LOGIN</div>
+            <div> <%= user.nick %> </div>
             <div> LOGOUT</div>
-        </div>
+    </div>
     <div id="perfil">
-        <div id="foto"></div>
+        <div id="foto">
+            <input id="fotofile" type="file">
+        </div>
         <div><%= user.nick %></div>
         <div><%= user.elo %></div>
         <div class="labels">VDE</div>

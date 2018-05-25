@@ -3,13 +3,12 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const path = __dirname.replace(/\\/g, '/'); //"/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";
+const path = "/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";//__dirname.replace(/\\/g, '/');
  
 
 server.listen(3000);
 app.get('/', (req, res) => res.sendFile(path + '/public/index.html'));
 app.use(express.static(path + '/public'));
-
 // Main <3
 io.on('connection', (socket) => {
   socket.emit('ok', listaPartidas);
@@ -128,7 +127,7 @@ function enroqueLargo(tablero, Py, room){
 function partidaAcabada(obj, mv) {
   Usuario.update({nick: eval(`obj.player${obj.turn + 1}.nick`)}, { $inc: { victorias: 1, games: 1, time: obj.time - obj.time1, elo: 30 }}, (err, user) => console.log(user));
   Usuario.update({nick: eval(`obj.player${1 - obj.turn + 1}.nick`)}, { $inc: { derrotas: 1, games: 1, time: obj.time - obj.time1, elo: -30}}, (err, user) => console.log(user));
-  io.to(mv.room).emit('mate', obj.turn);
+  io.to(mv.room).emit('mate', obj);
 }
 
 function crearSala(socket, data, nick, elo) {

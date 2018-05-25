@@ -99,11 +99,6 @@ socket.on('messy', (board) => {
     piecesOBJ[7] = tmp2;
 });
 
-socket.on('mate', (ganador) => {
-    let g = ["blancas", "negras"];
-    alert("Ganan las " + g[ganador]);
-})
-
 socket.on('tictoc', (info) => loadTimers(info));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -291,7 +286,6 @@ function animate(){
                     piecesOBJ[y].unshift(piecesOBJ[y][piecesOBJ[y].length - 1]);
                     piecesOBJ[y].pop();
                 }
-                console.table(piecesOBJ);
             }
         }
     }

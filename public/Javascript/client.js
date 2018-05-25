@@ -24,6 +24,7 @@ function client() {
     //MENU
     let minis = document.querySelectorAll('#menu *');
     minis[0].addEventListener('click', () => self.location='/profile');
+    minis[1].addEventListener('click', () => self.location='/ranking');
     minis[2].addEventListener('click', () => self.location='/');
     minis[4].addEventListener('click', () => self.location='/logout');
     //socket.on('helper', (obj) => console.table(obj.board));

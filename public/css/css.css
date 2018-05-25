@@ -42,7 +42,29 @@ html, body{
     margin-right: 10px;
 }
 
-
+#informe {
+    display: none; 
+    position: absolute;
+    font-size: 20px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr 1fr 1fr 1fr;
+    justify-self: center;
+    align-self: center;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 200px;
+    width: 40%;
+    height: 500px;
+    background-color: rgb(255, 255, 255);
+    z-index: 20;
+}
+span:nth-child(0){
+    color: green;
+}
+span:nth-child(1) {
+    color: red;
+}
 #menu * {
     transition: 0.3s;
     width: 100%;
