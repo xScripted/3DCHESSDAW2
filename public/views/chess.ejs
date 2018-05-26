@@ -4,7 +4,7 @@
     <title> Chess Miquel Toran</title>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="img/peon.png" />
-    <link rel="stylesheet" href="css/css.css">
+    <link rel="stylesheet" href="css/chess.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Raleway" rel="stylesheet"> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
@@ -31,14 +31,20 @@
 });
 </script>
 <body>
+    <div id="chat">
+        <div class="boton">Tablas</div>        
+        <div class="boton">Abandonar</div>  
+        <div id="contchat">xat</div>  
+        <input type="text">
+        <div class="boton">Enviar</div>
+    </div>
     <div id="informe">
-
     </div>
     <div id="menu">
         <div> PERFIL </div>
         <div> RANKING </div>   
         <div> HOME </div>
-        <% if (user.nick) { %>
+        <% if (user) { %>
         <div> <%= user.nick %></div>
         <% } %>
         <div> LOGOUT</div>

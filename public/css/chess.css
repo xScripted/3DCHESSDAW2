@@ -22,6 +22,46 @@ html, body{
     z-index: 5;
 }
 
+#chat {
+    padding: 20px;
+    position: absolute;
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-auto-rows: 1fr 10fr 1fr;
+    margin: 50px;
+    width: 300px;
+    height: 600px;
+    border: 2px solid black;
+    text-align: center;
+    z-index: 4;
+}
+#chat * {
+    box-shadow: inset 0px 0px 2px black;
+}
+.boton{
+    transition: .3s;
+    padding-top:15px; 
+}
+.boton:hover{
+    transition: .3s;
+    background-color: rgba(232, 182, 255, 0.698);
+    cursor: pointer;
+}
+#chat div:nth-child(1) {grid-column: 1/3}
+#chat div:nth-child(2) {grid-column: 3/5}
+#chat div:nth-child(3) {grid-column: 1/5}
+#chat input {
+    transition: .3s;
+    width: 100%;
+    border: 0px solid;
+    grid-column: 1/4;
+    background-color: rgba(255, 255, 255, 0.63);
+}
+#chat input:focus {
+    transition: .3s;
+    background-color: white;
+}
 #multiplayer {
     position: relative;
     z-index: 1;
@@ -57,7 +97,7 @@ html, body{
     width: 300px;
     height: 240px;
     background-color: rgb(212, 212, 212);
-    z-index: 20;
+    z-index: 3;
     box-shadow: 0px 0px 5px black;
 }
 span:nth-child(0){

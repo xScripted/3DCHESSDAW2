@@ -4,7 +4,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const path = __dirname.replace(/\\/g, '/');//"/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";
-var k = require(path + '/prueba');
+var test = require(path + '/testeos/test');
  
 
 server.listen(3000);
@@ -26,8 +26,6 @@ io.on('connection', (socket) => {
   socket.on('test',     (mv) => checkMove(socket, mv));
 });
 
-
-console.log(k.teclado("hey"));
 setInterval(() => io.emit('ok', listaPartidas), 1000);
 function checkMove(socket, mv) {
   let obj = 0; 
@@ -39,7 +37,7 @@ function checkMove(socket, mv) {
     mode: "normal"
   }
   obj = listaPartidas.filter((e) => e.name == mv.room)[0];
-  partidaAcabada(obj, mv);
+  //partidaAcabada(obj, mv);
   if(typeof(obj) == "undefined" || typeof(obj.modalidad) == "undefined")return false; //Evitar moviments de clients sense sala
   returned.mode = obj.modalidad;
   returned.move = testMove(obj.board, mv);
@@ -85,7 +83,7 @@ function checkMove(socket, mv) {
     } else {      
       returned['cl'] = obj; //No me acuerdo para que sirve esto
       //console.log("Jaque: " + obj.jaqueActivo); MIRAR QUIN JAQUE ESTA ACTIU
-      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo)) partidaAcabada(obj, mv);        
+      if(obj.jaqueActivo != 2 && testMate(obj.board, obj.jaqueActivo)) partidaAcabada(obj);        
 
       //Coronaciones 
       if(obj.board[mv.y2][mv.x2].tipo == "peon" && obj.board[mv.y2][mv.x2].color == 1 && mv.y2 == 0){
@@ -128,10 +126,10 @@ function enroqueLargo(tablero, Py, room){
   return tablero;
 }
 
-function partidaAcabada(obj, mv) {
+function partidaAcabada(obj) {
   Usuario.update({nick: eval(`obj.player${obj.turn + 1}.nick`)}, { $inc: { victorias: 1, games: 1, time: obj.time - obj.time1, elo: 30 }}, (err, user) => console.log(user));
   Usuario.update({nick: eval(`obj.player${1 - obj.turn + 1}.nick`)}, { $inc: { derrotas: 1, games: 1, time: obj.time - obj.time1, elo: -30}}, (err, user) => console.log(user));
-  io.to(mv.room).emit('mate', obj);
+  io.to(obj.name).emit('mate', obj);
 }
 
 function crearSala(socket, data, nick, elo) {
@@ -185,7 +183,10 @@ function joinSala(socket, data, nick, elo) {
         let temps = setInterval(() => {
           if(j.turn == 0)j.time1 -= 1;
           if(j.turn == 1)j.time2 -= 1;
-          if(j.time1 == 0 || j.time2 == 0)clearInterval(temps);
+          if(j.time1 == 0 || j.time2 == 0){
+            clearInterval(temps);
+            partidaAcabada(j);
+          }
 
           io.to(j.name).emit('tictoc', j); 
         }, 1000)     
@@ -194,8 +195,8 @@ function joinSala(socket, data, nick, elo) {
     }
   }
 }
-
 function borrarSala(socket){
+  console.log(listaPartidas.find(e => e.ids.find(ee => ee == socket.id)));
   listaPartidas = listaPartidas.filter((e) => e.name != socket.id);  //Creem un nou array treient la sala
   socket.leave(socket.name); // Sortim de la nostra propia sala
   socket.leave(Object.keys(socket.rooms)[0]); // Sortim de la sala anterior
@@ -218,162 +219,48 @@ function initBoard(){
     for(let x = 0; x < 8; x++){     
       //Creating pieces
       //PAWNS
-      if(y == 1)tmp = buildPieza(y, x, "peon", 0, tmp);  
-      if(y == 6)tmp = buildPieza(y, x, "peon", 1, tmp); 
+      if(y == 1)tmp = buildPieza(y, x, "peon", 0, tmp, test.peonBlanco);  
+      if(y == 6)tmp = buildPieza(y, x, "peon", 1, tmp, test.peonNegro); 
 
       //TOWERS
-      if(y == 0 && (x == 0 || x == 7))tmp = buildPieza(y, x, "torre", 0, tmp);
-      if(y == 7 && (x == 0 || x == 7))tmp = buildPieza(y, x, "torre", 1, tmp);
+      if(y == 0 && (x == 0 || x == 7))tmp = buildPieza(y, x, "torre", 0, tmp, test.torre);
+      if(y == 7 && (x == 0 || x == 7))tmp = buildPieza(y, x, "torre", 1, tmp, test.torre);
 
       //BISHOPS
-      if(y == 0 && (x == 2 || x == 5))tmp = buildPieza(y, x, "alfil", 0, tmp);
-      if(y == 7 && (x == 2 || x == 5))tmp = buildPieza(y, x, "alfil", 1, tmp);
+      if(y == 0 && (x == 2 || x == 5))tmp = buildPieza(y, x, "alfil", 0, tmp, test.alfil);
+      if(y == 7 && (x == 2 || x == 5))tmp = buildPieza(y, x, "alfil", 1, tmp, test.alfil);
 
       //KNIGHTS
-      if(y == 0 && (x == 1 || x == 6))tmp = buildPieza(y, x, "caballo", 0, tmp);
-      if(y == 7 && (x == 1 || x == 6))tmp = buildPieza(y, x, "caballo", 1, tmp);
+      if(y == 0 && (x == 1 || x == 6))tmp = buildPieza(y, x, "caballo", 0, tmp, test.caballo);
+      if(y == 7 && (x == 1 || x == 6))tmp = buildPieza(y, x, "caballo", 1, tmp, test.caballo);
       
       //QUEEN
-      if(y == 0 && x == 4)tmp = buildPieza(y, x, "dama", 0, tmp);
-      if(y == 7 && x == 4)tmp = buildPieza(y, x, "dama", 1, tmp);
+      if(y == 0 && x == 4)tmp = buildPieza(y, x, "dama", 0, tmp, test.dama);
+      if(y == 7 && x == 4)tmp = buildPieza(y, x, "dama", 1, tmp, test.dama);
 
       //KING
-      if(y == 0 && x == 3)tmp = buildPieza(y, x, "rey", 0, tmp);
-      if(y == 7 && x == 3)tmp = buildPieza(y, x, "rey", 1, tmp);
+      if(y == 0 && x == 3)tmp = buildPieza(y, x, "rey", 0, tmp, test.rey);
+      if(y == 7 && x == 3)tmp = buildPieza(y, x, "rey", 1, tmp, test.rey);
     }    
   } 
   return tmp;
 }
 
 //Constructor de Piezas
-function buildPieza(y, x, tipo, color, tmp){
-  tmp[y][x] = new Pieza(tipo, color, x);
+function buildPieza(y, x, tipo, color, tmp, test){
+  tmp[y][x] = new Pieza(tipo, color, x, test);
   return tmp;
 }
 
 class Pieza {
-  constructor(tipo, color, x){
+  constructor(tipo, color, x, test){
       this.color = color;
       this.tipo = tipo; //Peon, torre, reina, etc...
       this.used = false; // Solo para torres y reyes
       this.origx = x; //Para el modo Messy
+      this.test = test;      
   }
 }
-
-//PEON BLANCO                   
-function testPeonBlanco(tablero, Py, Px, y, x) { 
-  let allowPlay = true;
-  if(Px != x || Py > y || tablero[Py + 1][Px] != 0 || tablero[y][x] != 0 || ((y - Py) > 1))allowPlay = false;  
-  if(Px == x && Py == 1 && y == 3 && tablero[2][x] == 0)allowPlay = true;      
-  if((y == Py + 1 && x == Px + 1) && tablero[Py + 1][Px + 1].color == 1)allowPlay = true;     
-  if((y == Py + 1 && x == Px - 1) && tablero[Py + 1][Px - 1].color == 1)allowPlay = true;      
-  return allowPlay;
-}
-
-//PEON NEGRO                    
-function testPeonNegro(tablero, Py, Px, y, x) { 
-  let allowPlay = true;
-  if(Px != x || Py < y || tablero[Py - 1][Px] != 0 || tablero[y][x] != 0 || ((Py - y) > 1))allowPlay = false;  
-  if(Px == x && Py == 6 && y == 4 && tablero[5][x] == 0)allowPlay = true;    
-  if((y == Py - 1 && x == Px + 1) && tablero[Py - 1][Px + 1].color == 0)allowPlay = true;     
-  if((y == Py - 1 && x == Px - 1) && tablero[Py - 1][Px - 1].color == 0)allowPlay = true;     
-  return allowPlay;
-}
-
-//TORRES
-function testTorres(tablero, Py, Px, y, x, color) { 
-  let anti = 1 - color;
-  let [Mx, My] = [Px, Py];
-  let d = [];
-
-  if(Py == y || Px == x){
-    if(Py < y) while(Py <= y) d.push(tablero[Py++][Px])  
-    else if(Py > y) while(Py >= y) d.push(tablero[Py--][Px])
-    else if(Px < x) while(Px <= x) d.push(tablero[Py][Px++])
-    else if(Px > x) while(Px >= x) d.push(tablero[Py][Px--]); 
-
-    if(tablero[My][Mx].tipo == "rey" && tablero[My][Mx].color == color){
-        for(let e of d) {                
-        if((e.tipo == "torre" || e.tipo == "dama") && e.color == anti)return "jaque";     
-        if(e != 0 && e.tipo != "rey")return 2;
-      }
-      return 2;
-    }
-    return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti); //VALIDAMOS QUE NO HAYA PIEZAS DE POR MEDIO
-  }
-}
-
-//ALFILES
-function testAlfiles(tablero, Py, Px, y, x, color){ 
-  let [Mx, My] = [Px, Py];
-  let anti = 1 - color;
-
-  if(Px + y == Py + x){
-    let d = [];
-    if(My < y) while(My <= y) d.push(tablero[My++][Mx++]);
-    [Mx, My] = [Px, Py];
-    if(My > y) while(My >= y) d.push(tablero[My--][Mx--]);    
-    if(tablero[Py][Px].tipo == "rey" && tablero[Py][Px].color == color){
-      for(let e of d) {                
-        if((e.tipo == "alfil" || e.tipo == "dama") && e.color == anti)return "jaque";     
-        if(e != 0 && e.tipo != "rey")return 2;
-      }
-      return 2;
-    }
-    return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti); //VALIDAMOS QUE NO HAYA PIEZAS DE POR MEDIO
-  }
-  if(Px + Py == x + y){ 
-    let d = [];
-    if(My < y) while(My <= y) d.push(tablero[My++][Mx--]);
-    [Mx, My] = [Px, Py];
-    if(My > y) while(My >= y) d.push(tablero[My--][Mx++]); 
-    if(tablero[Py][Px].tipo == "rey" && tablero[Py][Px].color == color){
-      for(let e of d) {                
-        if((e.tipo == "alfil" || e.tipo == "dama") && e.color == anti)return "jaque";     
-        if(e != 0 && e.tipo != "rey")return 2;
-      }
-      return 2;
-    }   
-    return d.filter((e) => e != 0).length < 2 || (d.filter((e) => e != 0).length == 2 && d[d.length - 1].color == anti); //VALIDAMOS QUE NO HAYA PIEZAS DE POR MEDIO
-  }
-  return false;
-}
-
-//DAMAS
-function testDamas(tablero, Py, Px, y, x, color){
-  let allowPlay = true;
-  let diagonalOrecto;
-  if(Py == y && Px != x || Px == x && Py != y)diagonalOrecto = false;
-  if(y + Px == x + Py || (Math.abs(y - Px) == Math.abs(x - Py)))diagonalOrecto = true;
-  if(diagonalOrecto)allowPlay = testAlfiles(tablero, Py, Px, y, x, color);
-  if(!diagonalOrecto)allowPlay = testTorres(tablero, Py, Px, y, x, color);
-  if(diagonalOrecto == undefined)allowPlay = false;
-  return allowPlay;
-}
-
-//CABALLOS
-function testCaballos(tablero, Py, Px, y, x, color) {
-  let allowPlay = false;
-  let anti = 1 - color;
-  if(y >= 0 && y <= 7 && x >= 0 && x <= 7) {
-    if((Py + 2 == y || Py - 2 == y ) && (Px + 1 == x || Px - 1 == x))allowPlay = true;
-    if((Px + 2 == x || Px - 2 == x ) && (Py + 1 == y || Py - 1 == y))allowPlay = true;
-    if(tablero[y][x].color == color)allowPlay = false;    
-    if(allowPlay && tablero[y][x] != 0 && tablero[Py][Px].tipo == "rey" && tablero[y][x].tipo == "caballo" && tablero[y][x].color == anti)return "jaque";
-  }
-  return allowPlay;
-}
-
-//REY
-function testReyes(tablero, Py, Px, y, x, color, test = false){
-  let allowPlay = false;
-  let anti = 1 - color;
-  if(y > 7 || y < 0 || x > 7 || x < 0)return false;
-  if(Math.abs(Py - y) <= 1 && Math.abs(Px - x) <= 1 && tablero[y][x].color != color)allowPlay = true;
-  //Para que los reyes no se toquen entre si
-  for(let ty = y - 1; ty <= y+1; ty++)for(let tx = x - 1; tx <= x+1; tx++)if(ty >= 0 && ty <= 7)if(typeof(tablero[ty][tx]) != "undefined")if(tablero[ty][tx].tipo == "rey" && tablero[ty][tx].color == anti)allowPlay = false;
-  return allowPlay;
-} 
 
 //JAQUE
 function testJaque(tablero, jaque) {
@@ -384,34 +271,34 @@ function testJaque(tablero, jaque) {
       if(tablero[y][x] != 0){
         if(tablero[y][x].tipo == "rey"){
           let anti = 1 - tablero[y][x].color;
-          x = parseInt(x); // No deberia ser strings
+          x = parseInt(x); // No deberian ser strings
           y = parseInt(y);
           //Test rectas
           for(let xoy = 0; xoy <= 7; xoy += 7){
-            if(testTorres(tablero, y, x, xoy, x, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
-            if(testTorres(tablero, y, x, y, xoy, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
+            if(test.torre(tablero, y, x, xoy, x, tablero[y][x].color) == "jaque")return tablero[y][x].color;    
+            if(test.torre(tablero, y, x, y, xoy, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
           }       
           dy = y - x + 7;
           dx = x - y + 7;
           dy = dy > 7 ? 7 : dy;
           dx = dx > 7 ? 7 : dx;
           //Test diagonales
-          if(testAlfiles(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
+          if(test.alfil(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
           dy = y - x;
           dx = x - y;
           dy = dy < 0 ? 0 : dy;
           dx = dx < 0 ? 0 : dx;
-          if(testAlfiles(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
+          if(test.alfil(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
           dy = y + x;
           dx = y + x - 7;
           dx = dx < 0 ? 0 : dx;
           dy = dy > 7 ? 7 : dy;
-          if(testAlfiles(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
-          if(testAlfiles(tablero, y, x, dx, dy, tablero[y][x].color) == "jaque")return tablero[y][x].color;
+          if(test.alfil(tablero, y, x, dy, dx, tablero[y][x].color) == "jaque")return tablero[y][x].color; 
+          if(test.alfil(tablero, y, x, dx, dy, tablero[y][x].color) == "jaque")return tablero[y][x].color;
           
           //Test Caballos
           let c = [[2, -2],[1, -1]];
-          for(let n = -2; n <= 2; n++) if(n != 0) for(let k of c[Math.abs(n) - 1]) if(testCaballos(tablero, y, x, y + n, x + k, tablero[y][x].color) == "jaque")return tablero[y][x].color;;
+          for(let n = -2; n <= 2; n++) if(n != 0) for(let k of c[Math.abs(n) - 1]) if(test.caballo(tablero, y, x, y + n, x + k, tablero[y][x].color) == "jaque")return tablero[y][x].color;;
 
           //Test Peones
           if(tablero[y][x].color == 1){
@@ -430,13 +317,7 @@ function testJaque(tablero, jaque) {
 }
 
 function testMove(board, mv) {
-  if(board[mv.y1][mv.x1].tipo == "peon" && board[mv.y1][mv.x1].color == 0)return testPeonBlanco(board, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON B
-  if(board[mv.y1][mv.x1].tipo == "peon" && board[mv.y1][mv.x1].color == 1)return testPeonNegro (board, mv.y1, mv.x1, mv.y2, mv.x2); //TEST PEON N   
-  if(board[mv.y1][mv.x1].tipo == "torre")   return testTorres  (board, mv.y1, mv.x1, mv.y2, mv.x2, board[mv.y1][mv.x1].color); //TEST TORRE B&N
-  if(board[mv.y1][mv.x1].tipo == "alfil")   return testAlfiles (board, mv.y1, mv.x1, mv.y2, mv.x2, board[mv.y1][mv.x1].color); //TEST ALFIL B&N
-  if(board[mv.y1][mv.x1].tipo == "dama")    return testDamas   (board, mv.y1, mv.x1, mv.y2, mv.x2, board[mv.y1][mv.x1].color); //TEST DAMAS B&N
-  if(board[mv.y1][mv.x1].tipo == "caballo") return testCaballos(board, mv.y1, mv.x1, mv.y2, mv.x2, board[mv.y1][mv.x1].color); //TEST CABALLOS B&N
-  if(board[mv.y1][mv.x1].tipo == "rey")     return testReyes   (board, mv.y1, mv.x1, mv.y2, mv.x2, board[mv.y1][mv.x1].color); //TEST REYES B&N        
+  return board[mv.y1][mv.x1].test(board, mv.y1, mv.x1, mv.y2, mv.x2, board[mv.y1][mv.x1].color);
 }
 
 //JAQUE MATE

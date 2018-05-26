@@ -49,6 +49,7 @@ socket.on('testReturned', (returned) => {
         }
     }
     if(returned.move)mv = returned.mv;
+    console.table(piecesOBJ);
 })
 
 socket.on('ec', (Py) => {
@@ -81,10 +82,10 @@ socket.on('coronaBlanca', (mv) => {
 
 socket.on('newGame', (info) => {
     if(socket.id == info.ids[1]){
-        camera.position.set(5, 25, -40);
+        camera.position.set(5, 25, 40);
         camera.lookAt(5, 2, 5);
     } else {
-        camera.position.set(5, 25, 40);
+        camera.position.set(5, 25, -40);
         camera.lookAt(5, 2, 5);
     }
     modo = info.modalidad;
@@ -109,7 +110,7 @@ socket.on('messy', (board) => {
 });
 
 socket.on('tictoc', (info) => loadTimers(info));
-
+//socket.on('helper', (obj) => console.table(obj.board));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function init() {
@@ -147,7 +148,7 @@ function init() {
     //*// CONTROL DE CAMARA    
     camera.position.set(0, 20, 40);
 
-    var helper = new THREE.CameraHelper(camera);
+    //var helper = new THREE.CameraHelper(camera);
     //scene.add(helper);
 
     let controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -283,7 +284,7 @@ function animate(){
         }
 
         //Animacion finaltzada
-        if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2 && piecesOBJ[mv.y1][mv.x1].position.y <= 1){
+        if(piecesOBJ[mv.y1][mv.x1].position.z == mv.y2 && piecesOBJ[mv.y1][mv.x1].position.x == mv.x2 && (piecesOBJ[mv.y1][mv.x1].raza != "knight" || piecesOBJ[mv.y1][mv.x1].position.y <= 1)){
             //Reposicionar
             piecesOBJ[mv.y2][mv.x2] = piecesOBJ[mv.y1][mv.x1];
             piecesOBJ[mv.y1][mv.x1] = 0;
@@ -333,7 +334,7 @@ function onClick(event) {
 function newLight(x,y,z, lateral = false, color = 0xffffff, int = 0.4) {
     //Llums !
     let spotLight = new THREE.SpotLight(color);
-    let spotLightHelper = new THREE.SpotLightHelper(spotLight);
+    //let spotLightHelper = new THREE.SpotLightHelper(spotLight);
     spotLight.position.set(x,y,z);
     spotLight.penumbra = 0.5;
     spotLight.decay = 2;

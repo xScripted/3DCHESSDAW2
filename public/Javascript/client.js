@@ -26,8 +26,7 @@ function client() {
     minis[0].addEventListener('click', () => self.location='/profile');
     minis[1].addEventListener('click', () => self.location='/ranking');
     minis[2].addEventListener('click', () => self.location='/');
-    minis[4].addEventListener('click', () => self.location='/logout');
-    //socket.on('helper', (obj) => console.table(obj.board));
+    minis[4].addEventListener('click', () => self.location='/logout');   
     $.ajax({
         type: 'get',        
         url: '/user',
@@ -35,6 +34,10 @@ function client() {
             alert("Ajax enviado !");
         }
     })  
+
+    //CHAT
+    let botones = document.querySelectorAll(".boton");
+    botones[1].addEventListener('click', () => socket.emit('borrarSala'));
 } 
     
 
