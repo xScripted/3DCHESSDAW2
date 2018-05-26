@@ -4,6 +4,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const path = __dirname.replace(/\\/g, '/');//"/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";
+var k = require(path + '/prueba');
  
 
 server.listen(3000);
@@ -25,6 +26,8 @@ io.on('connection', (socket) => {
   socket.on('test',     (mv) => checkMove(socket, mv));
 });
 
+
+console.log(k.teclado("hey"));
 setInterval(() => io.emit('ok', listaPartidas), 1000);
 function checkMove(socket, mv) {
   let obj = 0; 
@@ -512,6 +515,9 @@ app.get('/ranking', (req, res) => {
   });
 })
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
+app.get('/chess', (req, res) => {
+  res.render(path + '/public/views/chess.ejs', {user: req.user});
+})
 app.post('/chess', controladorUsuario.postLogin, (req, res) => {
   res.render(path + '/public/views/chess.ejs', {user: req.user});
 });

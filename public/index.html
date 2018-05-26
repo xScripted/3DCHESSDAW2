@@ -2,12 +2,13 @@
 <html lang="ca">
 <head>
     <meta charset="utf-8">
-    <title>Portada</title>
+    <title>AJE3D</title>
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Raleway" rel="stylesheet"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="Javascript/TweenMax.min.js"></script>
     <script>
         window.onload = () => {
-            go.addEventListener('click', () => self.location="chess.html");
+            go.addEventListener('click', () => self.location="/chess");
             titulo.addEventListener('click', () => {
                 form1.style.display = "grid";
                 form2.style.display = "none";
@@ -20,6 +21,38 @@
             var tagline = document.querySelectorAll("#tagline img");
             var tl = new TimelineLite();
             tl.staggerFrom(tagline, 0.5, {top:"-=30px", rotation:"180deg", alpha:0, scale: 2, ease: Expo.easeInOut}, 0.2);  
+            $("#form1").submit(function(e) {
+                $.ajax({
+                    type: "POST",
+                    url: "/chess",
+                    data: $("#form1").serialize(), // serializes the form's elements.
+                    success: function(data){
+                         location.href = "/chess";
+                    },
+                    error: function (data) {
+                        space.style.display = "none";
+                        message.style.display = "block";
+                    }
+                });
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+            });
+
+            $("#form2").submit(function(e) {
+                $.ajax({
+                    type: "POST",
+                    url: "/signup",
+                    data: $("#form2").serialize(), // serializes the form's elements.
+                    success: function(data){
+                         location.href = "/chess";
+                    },
+                    error: function (data) {
+                        space2.style.display = "none";
+                        message2.style.display = "block";
+                    }
+                });
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+            });
+
         }
     </script>
     <link rel="stylesheet" type="text/css" href="css/index.css">
@@ -37,10 +70,10 @@
                 <img src="img/index/d.png">
             </div>  
         </div>  
-        <form id="form1" method="POST" action="/chess">
+        <form id="form1">
             <input name="nick" type="text" placeholder="Nick">
             <input name="password" type="password" placeholder="Password">
-            <br>
+            <br id="space"><div class="error" id="message"> Usuario o password incorrectos </div>
             <input type="submit" value="Iniciar Sesión">
             <input id="register" type="button" value="Registrarse">
             <input id="go" type="button" value="Jugar como invitado">  
@@ -50,7 +83,7 @@
             <input name="nick" type="text" placeholder="Nick">
             <input name="email" type="email" placeholder="E-Mail">
             <input name="password" type="password" placeholder="Password">
-            <br>
+            <br id="space2"><div class="error" id="message2"> Nick y Password obligatorio ! </div>
             <input type="submit" value="Registrarse e Iniciar Sesion">
         </form>   
     </div>

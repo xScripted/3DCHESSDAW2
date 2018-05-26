@@ -38,7 +38,9 @@
         <div> PERFIL </div>
         <div> RANKING </div>   
         <div> HOME </div>
+        <% if (user.nick) { %>
         <div> <%= user.nick %></div>
+        <% } %>
         <div> LOGOUT</div>
     </div>
     <div id="board3D"></div>

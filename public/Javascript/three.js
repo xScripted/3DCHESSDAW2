@@ -17,6 +17,7 @@ var wz = 2, bz = 5, wx = 9, bx = 9;
 var subid = 0;
 var enroqueC, enroqueL;
 var modo = "normal";
+var cameraZ = 40;
 // MAIN
 window.onload = () => {
     client();
@@ -79,14 +80,22 @@ socket.on('coronaBlanca', (mv) => {
 })
 
 socket.on('newGame', (info) => {
+    if(socket.id == info.ids[1]){
+        camera.position.set(5, 25, -40);
+        camera.lookAt(5, 2, 5);
+    } else {
+        camera.position.set(5, 25, 40);
+        camera.lookAt(5, 2, 5);
+    }
     modo = info.modalidad;
-    removePieces();
+    removePieces(); 
     //genPieces();
     room = info.ids[0]; //Guardem en quina room esta   
     board3D.style.zIndex = 1; 
     multiplayer.style.zIndex = -1;
     loadTexts(info);
 })
+
 
 socket.on('messy', (board) => {
     let tmp = new Array(8);
@@ -114,7 +123,6 @@ function init() {
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(width, height);
 
-
     //PRUEBAS BACKGROUND
     scene.background = new THREE.CubeTextureLoader().setPath('../img/maps/')
 	.load([
@@ -137,7 +145,7 @@ function init() {
     newLight(30, 1, 3.5, true);
     
     //*// CONTROL DE CAMARA    
-    camera.position.set(0, 30, 30);
+    camera.position.set(0, 20, 40);
 
     var helper = new THREE.CameraHelper(camera);
     //scene.add(helper);

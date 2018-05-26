@@ -43,11 +43,11 @@ exports.postLogin = (req, res, next) => {
         if(!usuario){
             return res.status(400).send("Nick o password no validos");
         }
-        req.logIn(usuario, (err) => {
+        req.logIn(usuario, (err) => {  
             if (err){
                 next(err);
-            }            
-            next();
+            }          
+            next();        
         })
     })(req, res, next);
 }
