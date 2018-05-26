@@ -34,8 +34,19 @@ html, body{
     height: 600px;
     border: 2px solid black;
     text-align: center;
-    z-index: 4;
+    z-index: -1;
 }
+#contchat {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+#contchat div {
+    width: 280px;
+    padding: 10px;
+    text-align: left;
+    overflow-wrap: break-word;
+}
+
 #chat * {
     box-shadow: inset 0px 0px 2px black;
 }

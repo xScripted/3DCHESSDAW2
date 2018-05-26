@@ -37,7 +37,28 @@ function client() {
 
     //CHAT
     let botones = document.querySelectorAll(".boton");
-    botones[1].addEventListener('click', () => socket.emit('borrarSala'));
+    botones[0].addEventListener('click', () => {
+        if(botones[0].getAttribute("tablas") == "false") {
+            botones[0].style.backgroundColor = "pink";        
+            botones[0].setAttribute("tablas", "true");  
+            socket.emit('tablas', true);   
+        } else {
+            botones[0].style.backgroundColor = "transparent";  
+            botones[0].setAttribute("tablas", "false");  
+            socket.emit('tablas', false);        
+        }
+    });
+    botones[1].addEventListener('click', () => socket.emit('borrarSala', true));
+    botones[2].addEventListener('click', () => {
+        socket.emit('chat', msg.value);
+        msg.value = "";
+    });
+    socket.on('mensaje', (msg) => {
+        let d = document.createElement("div");
+        let txt = document.createTextNode(msg);
+        d.appendChild(txt);
+        contchat.appendChild(d);
+    });
 } 
     
 

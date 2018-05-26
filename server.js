@@ -21,9 +21,18 @@ io.on('connection', (socket) => {
   });
   socket.on('crearSala',(tm) => crearSala(socket, tm, nick, elo));
   socket.on('disconnect', () => borrarSala(socket));
-  socket.on('borrarSala', () => borrarSala(socket));
+  socket.on('borrarSala',(f) => borrarSala(socket, f));
   socket.on('joinSala', (id) => joinSala(socket, id, nick, elo));
-  socket.on('test',     (mv) => checkMove(socket, mv));
+  socket.on('test', (mv) => checkMove(socket, mv));
+  socket.on('chat', (msg) => io.emit('mensaje', msg));
+  socket.on('tablas', (ok) => {
+    let sala = listaPartidas.find(e => e.ids.find(ee => ee == socket.id));  
+    if(sala){
+      if(ok)sala.tablas++;
+      if(!ok)sala.tablas--;
+      if(sala.tablas == 2)empate(sala);
+    }
+  });
 });
 
 setInterval(() => io.emit('ok', listaPartidas), 1000);
@@ -126,6 +135,12 @@ function enroqueLargo(tablero, Py, room){
   return tablero;
 }
 
+function empate(obj){
+  Usuario.update({nick: eval(`obj.player${obj.turn + 1}.nick`)}, { $inc: { empates: 1, games: 1, time: obj.time - obj.time1}}, (err, user) => console.log(user));
+  Usuario.update({nick: eval(`obj.player${1 - obj.turn + 1}.nick`)}, { $inc: { empates: 1, games: 1, time: obj.time - obj.time1}}, (err, user) => console.log(user));
+  io.to(obj.name).emit('empate', obj);
+}
+
 function partidaAcabada(obj) {
   Usuario.update({nick: eval(`obj.player${obj.turn + 1}.nick`)}, { $inc: { victorias: 1, games: 1, time: obj.time - obj.time1, elo: 30 }}, (err, user) => console.log(user));
   Usuario.update({nick: eval(`obj.player${1 - obj.turn + 1}.nick`)}, { $inc: { derrotas: 1, games: 1, time: obj.time - obj.time1, elo: -30}}, (err, user) => console.log(user));
@@ -146,6 +161,7 @@ function crearSala(socket, data, nick, elo) {
       player2: {nick: "user", elo: ""},
       ids: new Array(), 
       players: 1, 
+      tablas: 0,
       modalidad: data.modalidad,
       board: initBoard(), 
       jaqueActivo: 2, 
@@ -195,8 +211,9 @@ function joinSala(socket, data, nick, elo) {
     }
   }
 }
-function borrarSala(socket){
-  console.log(listaPartidas.find(e => e.ids.find(ee => ee == socket.id)));
+function borrarSala(socket, ff = false){
+  let surrender = listaPartidas.find(e => e.ids.find(ee => ee == socket.id));
+  if(surrender && ff)partidaAcabada(surrender);
   listaPartidas = listaPartidas.filter((e) => e.name != socket.id);  //Creem un nou array treient la sala
   socket.leave(socket.name); // Sortim de la nostra propia sala
   socket.leave(Object.keys(socket.rooms)[0]); // Sortim de la sala anterior

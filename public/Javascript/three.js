@@ -49,7 +49,6 @@ socket.on('testReturned', (returned) => {
         }
     }
     if(returned.move)mv = returned.mv;
-    console.table(piecesOBJ);
 })
 
 socket.on('ec', (Py) => {
@@ -88,6 +87,7 @@ socket.on('newGame', (info) => {
         camera.position.set(5, 25, -40);
         camera.lookAt(5, 2, 5);
     }
+    chat.style.zIndex = 4;
     modo = info.modalidad;
     removePieces(); 
     //genPieces();
