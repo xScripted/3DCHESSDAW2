@@ -23,17 +23,10 @@ function client() {
 
     //MENU
     let minis = document.querySelectorAll('#menu *');
-    minis[0].addEventListener('click', () => self.location='/profile');
-    minis[1].addEventListener('click', () => self.location='/ranking');
-    minis[2].addEventListener('click', () => self.location='/');
-    minis[4].addEventListener('click', () => self.location='/logout');   
-    $.ajax({
-        type: 'get',        
-        url: '/user',
-        success: () => {
-            alert("Ajax enviado !");
-        }
-    })  
+    minis[0].addEventListener('click', () => self.location='/ranking');
+    minis[1].addEventListener('click', () => self.location='/chess');
+    minis[2].addEventListener('click', () => self.location='/profile');
+    minis[3].addEventListener('click', () => self.location='/logout'); 
 
     //CHAT
     let botones = document.querySelectorAll(".boton");
@@ -60,9 +53,6 @@ function client() {
         contchat.appendChild(d);
     });
 } 
-    
-
-
 
 function toTimeSystem(time){
     let min = Math.floor(time / 60);

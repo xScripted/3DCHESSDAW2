@@ -14,7 +14,7 @@ const usuarioSchema = new Schema({
     empates:  {type: Number},
     games:    {type: Number},
     time:     {type: Number},
-    avatar:   {type: String},
+    avatar:   {type: String}
 }, {
     timestamps: true //Indica cuando fue creado
 })

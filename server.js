@@ -8,7 +8,7 @@ var test = require(path + '/testeos/test');
  
 
 server.listen(3000);
-app.get('/', (req, res) => res.sendFile(path + '/public/index.html'));
+app.get('/', (req, res) => res.render(path + '/public/views/index.ejs'));
 app.use(express.static(path + '/public'));
 // Main <3
 io.on('connection', (socket) => {
@@ -422,5 +422,3 @@ app.post('/chess', controladorUsuario.postLogin, (req, res) => {
 app.get('/profile', passportConfig.estaAutenticado, (req, res) => {  
   res.render(path + '/public/views/perfil.ejs', {user: req.user});
 });
-
-

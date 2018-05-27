@@ -36,6 +36,7 @@ body * {
     position: relative;
     margin: auto;
     width: 80%;
+    cursor: pointer;
 }
 form {
     display: grid;
@@ -54,10 +55,11 @@ form {
 }
 input[type="button"], input[type="submit"] {
     transition: 0.3s;
-    background-color: rgba(255, 255, 255, 0.2);
+    border: 0;
+    background-color: rgba(255, 255, 255, 0.397);
 }
 input[type="button"]:hover,input[type="submit"]:hover {
     transition: 0.3s;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.808);
 }
 

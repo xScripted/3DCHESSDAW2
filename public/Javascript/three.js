@@ -264,22 +264,22 @@ function animate(){
 
         //Enroque Corto
         if(enroqueC == 0){
-            piecesOBJ[0][2].position.x = Math.round((piecesOBJ[0][2].position.x + 0.1) * 10) / 10;
+            piecesOBJ[0][2].position.x = Math.round((piecesOBJ[0][2].position.x + 0.2) * 10) / 10;
             if(piecesOBJ[0][2].position.x == 2)enroqueC = 10;
         }
         if(enroqueC == 7){
-            piecesOBJ[7][2].position.x = Math.round((piecesOBJ[7][2].position.x + 0.1) * 10) / 10;
+            piecesOBJ[7][2].position.x = Math.round((piecesOBJ[7][2].position.x + 0.2) * 10) / 10;
             if(piecesOBJ[7][2].position.x == 2)enroqueC = 10;
         }
 
         //Enroque Largo
         if(enroqueL == 0){
-            piecesOBJ[0][4].position.x = Math.round((piecesOBJ[0][4].position.x - 0.15) * 100) / 100;
+            piecesOBJ[0][4].position.x = Math.round((piecesOBJ[0][4].position.x - 0.3) * 100) / 100;
             if(piecesOBJ[0][4].position.x == 4)enroqueL = 10;
         }
 
         if(enroqueL == 7){
-            piecesOBJ[7][4].position.x = Math.round((piecesOBJ[7][4].position.x - 0.15) * 100) / 100;
+            piecesOBJ[7][4].position.x = Math.round((piecesOBJ[7][4].position.x - 0.3) * 100) / 100;
             if(piecesOBJ[7][4].position.x == 4)enroqueL = 10;
         }
 
@@ -385,7 +385,7 @@ function loadTexts(info) {
     var loader = new THREE.FontLoader();
     var material = new THREE.MeshBasicMaterial({color: "black"});
 
-    loader.load( 'helvetiker_regular.typeface.json', (font) => {
+    loader.load('../models/helvetiker_regular.typeface.json', (font) => {
         var geometry = new THREE.TextGeometry( `${info.player2.nick} ${info.player2.elo}`, {
             font: font,
             size: 1,
@@ -413,7 +413,7 @@ function loadTexts(info) {
         scene.add(texto2);
     });
 
-    loader.load( 'helvetiker_regular.typeface.json', (font) => {
+    loader.load( '../models/helvetiker_regular.typeface.json', (font) => {
         var geometry = new THREE.TextGeometry(toTimeSystem(info.time1), {
             font: font,
             size: 0.7,
@@ -439,7 +439,6 @@ function loadTexts(info) {
         timer2.rotateX(-90 * Math.PI / 180);
         timer2.rotateY(30 * Math.PI / 180);
         timer2.rotateZ(90 * Math.PI / 180);
-        console.log(timer1);
         scene.add(timer1);
         scene.add(timer2);
     });
@@ -450,7 +449,7 @@ function loadTimers(info){
     var black = new THREE.MeshBasicMaterial({color: "black"});
     var blue = new THREE.MeshBasicMaterial({color: "blue"});
     var loader = new THREE.FontLoader();
-    loader.load( 'helvetiker_regular.typeface.json', (font) => {
+    loader.load( '../models/helvetiker_regular.typeface.json', (font) => {
         var geometry = new THREE.TextGeometry(toTimeSystem(info.time1), {
             font: font,
             size: 0.7,

@@ -2,23 +2,27 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <title> AJE3D </title>
     <link rel="stylesheet" type="text/css" href="perfil.css">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat|Raleway:900" rel="stylesheet"> 
+    <link rel="shortcut icon" href="../img/multiplayer.png" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat|Raleway:900" rel="stylesheet">
     <script src="Javascript/TweenMax.min.js"></script>
 </head>
 <style>
-    body {
-        background-color: black;
-        overflow: hidden;
-    }
-    #ranking {
-        position: relative;
-        margin: auto;
-        width: 70%;
-        height: 100%;
-        background-color: white;
-    }
-    #menu {
+body {
+    background-color: black;
+    overflow: hidden;
+    font-family: Montserrat, sans-serif;
+
+}
+#ranking {
+    position: relative;
+    margin: auto;
+    width: 70%;
+    height: 100%;
+    background-color: white;
+}
+#menu {
     margin: auto;
     position: relative;
     display: flex;
@@ -27,9 +31,10 @@
     left: 0;
     right: 0;
     margin-top: 20px;
+    margin-bottom: 20px;
     width: 50%;
     height: 50px;
-    background-color: rgba(0, 0, 0, 0.274);
+    background-color: rgba(255, 255, 255, 0.274);
     z-index: 5;
 }
 #menu * {
@@ -65,22 +70,22 @@
 <script>
     window.onload = () => {
         let minis = document.querySelectorAll('#menu *');
-        minis[0].addEventListener('click', () => self.location='/profile');
-        minis[1].addEventListener('click', () => self.location='/ranking');
-        minis[2].addEventListener('click', () => self.location='/');
-        minis[4].addEventListener('click', () => self.location='/logout');
+        minis[0].addEventListener('click', () => self.location='/ranking');
+        minis[1].addEventListener('click', () => self.location='/chess');
+        minis[2].addEventListener('click', () => self.location='/profile');
+        minis[3].addEventListener('click', () => self.location='/logout');
     }
 </script>
 <body>    
     <div id="particles"></div>
     <script src="../Javascript/particles.js"></script>
+    <div id="menu">   
+        <div> RANKING </div>   
+        <div> LOBBY </div>
+        <div> PERFIL</div>
+        <div> LOGOUT</div>
+    </div>
     <div id="ranking">
-        <div id="menu">
-                <div> PERFIL </div>
-                <div> RANKING </div>   
-                <div> HOME </div>
-                <div> LOGOUT</div>
-        </div>
         <table>
             <tr>
                 <th>Nombre</th>
