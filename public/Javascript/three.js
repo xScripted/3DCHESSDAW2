@@ -97,7 +97,6 @@ socket.on('newGame', (info) => {
     loadTexts(info);
 })
 
-
 socket.on('messy', (board) => {
     let tmp = new Array(8);
     let tmp2 = new Array(8);
@@ -110,7 +109,7 @@ socket.on('messy', (board) => {
 });
 
 socket.on('tictoc', (info) => loadTimers(info));
-//socket.on('helper', (obj) => console.table(obj.board));
+socket.on('helper', (obj) => console.log(obj.board));
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function init() {

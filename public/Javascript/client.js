@@ -6,7 +6,7 @@ function client() {
     //Socket IO
     var inputs = document.querySelectorAll("#crearysalir input");
     inputs[0].addEventListener("click", () => {
-        socket.emit('crearSala', {modalidad: modalidad.value, tiempo: tiempo.value});
+        socket.emit('crearSala', {modalidad: modalidad.value, tiempo: Math.abs(tiempo.value)});
     })
     inputs[2].addEventListener("click", () => socket.emit('borrarSala'));
     socket.on('ok', (listaPartidas) => {
