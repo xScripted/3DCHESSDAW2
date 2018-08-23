@@ -395,7 +395,7 @@ app.use(session({
     resave: true, //Guarda en cada llamada
     saveUninitialized: true, //Guarda en la bd el objeto vacio
     store: new MongoStore({
-        url: "mongodb://localhost:27017/auth",
+        url: "mongodb://Scripted:mkllkm97MM@ds225492.mlab.com:25492/aje3d",
         autoReconnect: true
     })
 }))
