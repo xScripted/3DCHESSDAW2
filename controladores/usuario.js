@@ -1,7 +1,5 @@
 const passport = require('passport');
-const Usuario = require('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/models/Usuario');
-const mongoose = require('mongoose');
-const MONGO_URL = "mongodb://localhost:27017/auth";
+const Usuario = require('../models/Usuario');
 
 exports.postSignup = (req, res, next) => {
     const nuevoUsuario = new Usuario({

@@ -123,8 +123,9 @@ function init() {
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(width, height);
 
+    renderer.setClearColor (0xffffff, 1);
     //PRUEBAS BACKGROUND
-    scene.background = new THREE.CubeTextureLoader().setPath('../img/maps/')
+   /* scene.background = new THREE.CubeTextureLoader().setPath('../img/maps/')
 	.load([
         'px.png',
         'nx.png',
@@ -132,7 +133,7 @@ function init() {
         'ny.png',
         'pz.png',
         'nz.png'
-	]);
+	]);*/
 
     ///////////////////////////*/
     let light = new THREE.AmbientLight("white"); // soft white light

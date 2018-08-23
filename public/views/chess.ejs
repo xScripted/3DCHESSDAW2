@@ -4,14 +4,14 @@
     <title> AJE3D </title>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="../img/multiplayer.png" />
-    <link rel="stylesheet" href="css/chess.css">
+    <link rel="stylesheet" type="text/css" href="../css/chess.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Raleway" rel="stylesheet"> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/client.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/three.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/OrbitControls.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js-master/TextureLoader.js"></script>
-    <script type="text/javascript" charset="utf8" src="Javascript/three.js"></script>
+    <script type="text/javascript" charset="utf8" src="../Javascript/client.js"></script>
+    <script type="text/javascript" charset="utf8" src="../Javascript/three.js-master/three.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="../Javascript/three.js-master/OrbitControls.js"></script>
+    <script type="text/javascript" charset="utf8" src="../Javascript/three.js-master/TextureLoader.js"></script>
+    <script type="text/javascript" charset="utf8" src="../Javascript/three.js"></script>
 </head>
 <script>
     socket.emit('getData', {nick: '<%= user.nick %>', elo: '<%= user.elo %>'});

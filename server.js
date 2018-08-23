@@ -3,13 +3,14 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const path = __dirname.replace(/\\/g, '/');//"/home/miquel/Escritorio/aje3d/3DCHESSDAW2/";
-var test = require(path + '/testeos/test');
+var test = require('./testeos/test');
  
+server.listen(3000, () => {
+  console.log(`Server running at http://localhost:3000/ !!`);
+});
 
-server.listen(3000);
-app.get('/', (req, res) => res.render(path + '/public/views/index.ejs'));
-app.use(express.static(path + '/public'));
+app.get('/', (req, res) => res.render('../public/views/index.ejs'));
+app.use(express.static('./public'));
 // Main <3
 io.on('connection', (socket) => {
   socket.emit('ok', listaPartidas);
@@ -376,14 +377,14 @@ const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const passportConfig = require(path +'/config/passport');
-const controladorUsuario = require(path + '/controladores/usuario');
-const Usuario = require(path + '/models/Usuario');
+const passportConfig = require('./config/passport');
+const controladorUsuario = require('./controladores/usuario');
+const Usuario = require('./models/Usuario');
 const ejs = require('ejs');
 var db;
 
 mongoose.Promise = global.Promise;
-db = mongoose.connect("mongodb://localhost:27017/auth");
+db = mongoose.connect("mongodb://Scripted:mkllkm97MM@ds225492.mlab.com:25492/aje3d");
 mongoose.connection.on('error', (err) => {
     throw err;
     process.exit(1);
@@ -404,21 +405,21 @@ app.use(passport.session());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.post('/signup', controladorUsuario.postSignup, (req, res) => {
-  res.render(path + '/public/views/chess.ejs', {user: req.user});
+  res.render('../public/views/chess.ejs', {user: req.user});
 });
 app.get('/ranking', (req, res) => {
   Usuario.find({}, (err, todo) => {    
     todo = Array.from(todo);    
-    res.render(path + '/public/views/ranking.ejs', {data: todo.sort((a, b) => a.elo < b.elo)});
+    res.render('../public/views/ranking.ejs', {data: todo.sort((a, b) => a.elo < b.elo)});
   });
 })
 app.get('/logout', passportConfig.estaAutenticado, controladorUsuario.logout);
 app.get('/chess', (req, res) => {
-  res.render(path + '/public/views/chess.ejs', {user: req.user});
+  res.render('../public/views/chess.ejs', {user: req.user});
 })
 app.post('/chess', controladorUsuario.postLogin, (req, res) => {
-  res.render(path + '/public/views/chess.ejs', {user: req.user});
+  res.render('../public/views/chess.ejs', {user: req.user});
 });
 app.get('/profile', passportConfig.estaAutenticado, (req, res) => {  
-  res.render(path + '/public/views/perfil.ejs', {user: req.user});
+  res.render('../public/views/perfil.ejs', {user: req.user});
 });
