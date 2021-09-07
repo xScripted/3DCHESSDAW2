@@ -384,10 +384,9 @@ const ejs = require('ejs');
 var db;
 
 mongoose.Promise = global.Promise;
-db = mongoose.connect("mongodb://Scripted:mkllkm97MM@ds225492.mlab.com:25492/aje3d");
+db = mongoose.connect("mongodb://mongo/mydatabase");
 mongoose.connection.on('error', (err) => {
     throw err;
-    process.exit(1);
 })
 
 app.use(session({
@@ -395,7 +394,7 @@ app.use(session({
     resave: true, //Guarda en cada llamada
     saveUninitialized: true, //Guarda en la bd el objeto vacio
     store: new MongoStore({
-        url: "mongodb://Scripted:mkllkm97MM@ds225492.mlab.com:25492/aje3d",
+        url: "mongodb://mongo/mydatabase",
         autoReconnect: true
     })
 }))
