@@ -53,5 +53,5 @@ exports.postLogin = (req, res, next) => {
 
 exports.logout = (req, res) => {
     req.logout();
-    res.render('C:/Users/Work/Desktop/ProjecteFinal/3DCHESSDAW2/public/views/index.ejs');
+    res.render('../public/views/index.ejs');
 }
